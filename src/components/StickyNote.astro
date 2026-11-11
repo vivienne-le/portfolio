@@ -54,6 +54,11 @@ import { contact } from '../data/site.js';
   .drink > * { display: none; grid-area: 1 / 1; }
   .drink[data-kind="coffee"] [data-drink="coffee"], .drink[data-kind="matcha"] [data-drink="matcha"] { display: block; }
   .drink.on { animation: slap 520ms var(--ease-out) forwards; }
+  .drink.off { animation: peel 360ms var(--ease-out) forwards; }
+  @keyframes peel {
+    from { opacity: 1; transform: rotate(-14deg) scale(1); }
+    to   { opacity: 0; transform: rotate(-40deg) translate(-12px, 10px) scale(0.6); }
+  }
   @keyframes slap {
     0%   { opacity: 0; transform: rotate(-30deg) scale(1.8); }
     60%  { opacity: 1; transform: rotate(-10deg) scale(0.92); }
@@ -127,7 +132,7 @@ import { contact } from '../data/site.js';
     const kind = e.detail?.sticker;
     if (kind) {
       drink.dataset.kind = kind;
-      drink.classList.remove('on');
+      drink.classList.remove('on', 'off');
       void drink.offsetWidth;
       drink.classList.add('on');
     }
@@ -137,6 +142,15 @@ import { contact } from '../data/site.js';
     tick(2100);
   });
   note.addEventListener('animationend', () => note.classList.remove('attention'));
+  // "clear" in the terminal peels the drink sticker off again
+  window.addEventListener('note:clear', () => {
+    if (!drink.dataset.kind) return;
+    drink.classList.remove('on');
+    drink.classList.add('off');
+  });
+  drink.addEventListener('animationend', () => {
+    if (drink.classList.contains('off')) { drink.classList.remove('off'); delete drink.dataset.kind; }
+  });
 
   // Swap the mouse pointer for a waving hand while it's over the note.
   // The emoji's fingertip sits on the real pointer position, so clicks still land where you aim.

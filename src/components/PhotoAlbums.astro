@@ -163,6 +163,9 @@ const tilts = [-7, 4, -3, 6, -5, 3, -6, 5];
     .folders { gap: 4px; padding-top: 22px; }
     .spread { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
   }
+  @media (max-width: 360px) {
+    .art { transform: scale(0.6); margin: -26px -34px -28px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .card, .front, .sticker, .print { transition: none; }
     .spread li, .spread.show li { transition: none; opacity: 1; transform: none; }

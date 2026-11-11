@@ -173,7 +173,7 @@ const nowLines = currently.items.map((i) => `${i.label}: ${i.value}`);
     coffee: () => invite('coffee'),
     matcha: () => invite('matcha'),
     secret: () => { const on = document.documentElement.classList.toggle('party'); if (on) { confetti(); return 'cheers to finding my portfolio'; } return 'party’s over. type secret to start it again'; },
-    clear: () => { out.innerHTML = ''; return null; },
+    clear: () => { out.innerHTML = ''; window.dispatchEvent(new CustomEvent('note:clear')); return null; },
   };
   form.addEventListener('submit', (e) => {
     e.preventDefault();

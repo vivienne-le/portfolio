@@ -28,7 +28,8 @@ import { stickers } from '../data/site.js';
   /* Dotted journal paper */
   .board {
     position: relative; max-width: 50rem; margin-inline: auto;
-    aspect-ratio: 16 / 9;
+    isolation: isolate; /* keeps the stickers and "tidy up" below the nav and the contact note */
+    aspect-ratio: 16 / 10;
     border-radius: var(--radius-l);
     background-color: var(--paper);
     background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1.1px, transparent 1.6px);
@@ -94,7 +95,7 @@ import { stickers } from '../data/site.js';
   .tidy:hover { color: var(--ink); }
 
   @media (max-width: 640px) {
-    .board { aspect-ratio: 4 / 5; }
+    .board { aspect-ratio: 3 / 5; }
     .sticker { left: var(--mx0); top: var(--my0); width: calc(var(--w) * 1.6); }
   }
   @media (prefers-reduced-motion: reduce) {

@@ -34,6 +34,7 @@ const items = [
   .snav {
     position: fixed; z-index: 40; left: 50%; top: calc(40px + env(safe-area-inset-top, 0px)); /* room above for the dot's jump */
     translate: -50% 0;
+    width: max-content; /* Safari on phones squeezed the nav to half the screen, pushing the sound button out */
     display: flex; align-items: center; gap: 2px; padding: 4px;
     border-radius: 999px; background: color-mix(in srgb, var(--paper) 82%, transparent);
     -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
@@ -76,7 +77,7 @@ const items = [
     .snav {
       top: auto; bottom: max(16px, env(safe-area-inset-bottom, 0px));
     }
-    .item { padding: 16px 12px 12px; }
+    .item { padding: 16px 12px 12px; flex-shrink: 0; }
   }
 </style>
 
