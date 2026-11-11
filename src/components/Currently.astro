@@ -1,0 +1,21 @@
+---
+import { currently } from '../data/site.js';
+---
+<div class="cur">
+  <dl>
+    {currently.items.map((i) => (
+      <div data-cursor={i.cursor}><dt>{i.label}</dt><dd>{i.value}</dd></div>
+    ))}
+  </dl>
+  <p class="label">Updated {currently.updated}</p>
+</div>
+
+<style>
+  .cur { background: var(--paper-2); border-radius: var(--radius-m); padding: 18px 20px 14px; }
+  dl { margin: 0 0 10px; display: grid; gap: 8px; }
+  dl > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 12px; font-size: 0.92rem; }
+  dt { color: var(--ink-2); }
+  dd { margin: 0; }
+  p { margin: 0; }
+  @media (max-width: 420px) { dl > div { grid-template-columns: 1fr; gap: 0; } }
+</style>

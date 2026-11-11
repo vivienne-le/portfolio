@@ -1,0 +1,155 @@
+---
+// Selected work. Hovering one project dims the others and a picture of it pops out beside the list.
+import { projects, statusLabels } from '../data/site.js';
+
+const icons = {
+  clover: '<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="7" cy="7" r="4.5" fill="#fff"/><circle cx="13" cy="7" r="4.5" fill="#fff"/><circle cx="7" cy="13" r="4.5" fill="#fff"/><circle cx="13" cy="13" r="4.5" fill="#fff"/></svg>',
+  chart: '<svg width="18" height="18" viewBox="0 0 18 18"><path d="M3 13l4-5 3 3 5-7" stroke="#EDF0F8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  code: '<svg width="18" height="18" viewBox="0 0 18 18"><path d="M6 5L2 9l4 4M12 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  fish: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3-4.5 7-6 11-6 3.5 0 6 3 7 6-1 3-3.5 6-7 6-4 0-8-1.5-11-6z"/><path d="M3 12l-1.5-3.5M3 12l-1.5 3.5"/><circle cx="16.5" cy="10.5" r="0.9" fill="currentColor" stroke="none"/></svg>',
+  brick: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="10" width="18" height="10" rx="2"/><rect x="5.5" y="6.5" width="4.5" height="3.5" rx="1"/><rect x="14" y="6.5" width="4.5" height="3.5" rx="1"/></svg>',
+  robot: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V4.5"/><circle cx="12" cy="3.5" r="1"/><circle cx="9.5" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M2.5 12.5v3M21.5 12.5v3"/></svg>',
+  star: '<svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 2l2.1 4.5 4.9.6-3.6 3.3.9 4.8L9 12.8 4.7 15.2l.9-4.8L2 7.1l4.9-.6z" fill="currentColor"/></svg>',
+};
+// Newest first: sorted by `date` ('YYYY-MM') when a project has one, otherwise by `year`.
+// Projects from the same year without a date keep the order they have in site.js.
+const sortKey = (p) => p.date ?? `${p.year}-00`;
+const sorted = [...projects].sort((a, b) => sortKey(b).localeCompare(sortKey(a)));
+const bg = { blush: 'var(--blush)', navy: 'var(--navy)', lilac: 'var(--lilac)', butter: 'var(--butter)', mint: 'var(--mint)', sky: 'var(--sky)' };
+const fg = { lilac: 'var(--lilac-ink)', butter: 'var(--butter-ink)', mint: 'var(--mint-ink)', sky: 'var(--sky-ink)' };
+---
+<ul class="plist">
+  {sorted.map((p) => {
+    const external = /^https?:/.test(p.href ?? '');
+    const isLink = p.href && p.href !== '#';
+    const Row = isLink ? 'a' : 'div';
+    // Case studies on this site open at their header (#case)
+    const href = isLink && p.href.startsWith('/work/') && !p.href.includes('#') ? `${p.href}#case` : p.href;
+    return (
+      <li>
+        <Row class="prow" {...(isLink ? { href } : {})} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+          {p.logo
+            ? <span class="icon has-logo" aria-hidden="true"><img src={p.logo} alt="" width="40" height="40" loading="lazy" decoding="async" /></span>
+            : <span class="icon" style={`background:${bg[p.color] ?? 'var(--paper-2)'};color:${fg[p.color] ?? 'inherit'}`} aria-hidden="true" set:html={icons[p.icon] ?? ''} />}
+          <span class="txt">
+            <span class="t">{p.title}</span>
+            <span class="d">{p.blurb}</span>
+          </span>
+          <span class="right">
+            <span class={`chip chip-${p.status}`}>{statusLabels[p.status]}</span>
+            <span class="year">{p.year}</span>
+          </span>
+        </Row>
+        {p.comingSoon
+          ? <span class="peek chat" aria-hidden="true">
+              <span class="q">Is the case study ready?</span>
+              <span class="msg">Coming soon 👀</span>
+              <span class="delivered">Delivered</span>
+            </span>
+          : <span class="peek" aria-hidden="true">
+              <span class="paper">
+                {p.image
+                  ? <img src={p.image} alt="" loading="lazy" decoding="async" />
+                  : <span class="ph">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg>
+                      <span>project image</span>
+                    </span>}
+              </span>
+            </span>}
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .plist { list-style: none; margin: 0 -8px; padding: 0; }
+  li { position: relative; }
+  .prow {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: center;
+    padding: 10px 8px; border-radius: 12px; text-decoration: none; color: inherit;
+    transition: opacity var(--d-move) var(--ease-out);
+  }
+  @media (hover: hover) {
+    .plist:hover .prow { opacity: 0.36; }
+    .plist .prow:hover { opacity: 1; }
+  }
+  .plist:has(.prow:focus-visible) .prow:not(:focus-visible) { opacity: 0.36; }
+  .icon {
+    width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 6px -2px rgba(0, 0, 0, 0.18);
+    transition: transform var(--d-reveal) var(--spring);
+  }
+  .has-logo { overflow: hidden; background: var(--paper); }
+  .has-logo img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); }
+  .prow:hover .icon { transform: rotate(-6deg) scale(1.06); }
+  .txt { min-width: 0; }
+  .t { display: block; font-weight: 500; font-size: 0.94rem; line-height: 1.3; }
+  .d { display: block; font-size: 0.84rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .right { display: flex; align-items: center; gap: 12px; }
+  .year { font: 400 0.78rem/1 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  /* Project picture that pops out beside the list on hover.
+     Landscape on wide screens, a smaller landscape one on medium screens, hidden on narrow/touch screens. */
+  .peek {
+    --pw: 270px; --ph: 200px;
+    position: absolute; left: calc(100% + 28px); top: 50%; width: var(--pw); height: var(--ph);
+    pointer-events: none; z-index: 5;
+    opacity: 0; transform: translate(-16px, -50%) rotate(-4deg) scale(0.86);
+    transition: opacity var(--d-move) var(--ease-out), transform var(--d-object) var(--spring);
+  }
+  /* Same frame as the certificate pop-up: a sheet of paper with a soft shadow, no stamp edge */
+  .paper {
+    display: block; width: 100%; height: 100%; padding: 6px; background: var(--paper);
+    border-radius: 4px; box-shadow: var(--shadow), 0 0 0 1px var(--line);
+  }
+  .paper img, .ph { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 2px; }
+  .ph {
+    display: grid; place-content: center; justify-items: center; gap: 6px; color: var(--ink-3);
+    background: repeating-linear-gradient(135deg, var(--paper-2) 0 7px, transparent 7px 14px);
+    font: 400 0.62rem/1 var(--mono); letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .prow:hover + .peek, .prow:focus-visible + .peek { opacity: 1; transform: translate(0, -50%) rotate(3deg) scale(1); }
+  /* "Coming soon": a chat bubble instead of a picture (set comingSoon: true on the project).
+     On hover a grey question pops in, then your blue reply, then "Delivered". */
+  .chat {
+    --blue: #0a84ff; --grey: #e9e9eb; --grey-ink: #8e8e93;
+    display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, var(--sans);
+  }
+  .prow:hover + .chat, .prow:focus-visible + .chat { transform: translate(0, -50%) scale(1); }
+  .q, .msg {
+    position: relative; padding: 8px 14px; border-radius: 18px; font-size: 0.95rem; line-height: 1.3; white-space: nowrap; opacity: 0;
+  }
+  .q { align-self: flex-start; background: var(--grey); color: var(--ink); transform-origin: bottom left; margin-bottom: 6px; }
+  .msg { background: var(--blue); color: #fff; transform-origin: bottom right; }
+  /* grey bubble's tail, bottom-left */
+  .q::before, .q::after { content: ""; position: absolute; bottom: 0; height: 20px; }
+  .q::before { left: -7px; width: 20px; background: var(--grey); border-bottom-right-radius: 16px 14px; }
+  .q::after { left: -26px; width: 26px; background: var(--paper); border-bottom-right-radius: 10px; }
+  /* the little tail in the bottom-right corner */
+  .msg::before, .msg::after { content: ""; position: absolute; bottom: 0; height: 20px; }
+  .msg::before { right: -7px; width: 20px; background: var(--blue); border-bottom-left-radius: 16px 14px; }
+  .msg::after { right: -26px; width: 26px; background: var(--paper); border-bottom-left-radius: 10px; }
+  .delivered { font-size: 0.66rem; color: var(--grey-ink); margin-right: 4px; opacity: 0; }
+  .prow:hover + .chat .q, .prow:focus-visible + .chat .q { animation: msg-in 0.5s var(--spring) 0.1s forwards; }
+  .prow:hover + .chat .msg, .prow:focus-visible + .chat .msg { animation: msg-in 0.5s var(--spring) 0.7s forwards; }
+  .prow:hover + .chat .delivered, .prow:focus-visible + .chat .delivered { animation: fade-in 0.3s ease-out 1.2s forwards; }
+  @keyframes msg-in { from { opacity: 0; scale: 0.4; translate: 0 6px; } to { opacity: 1; scale: 1; translate: 0 0; } }
+  @keyframes fade-in { to { opacity: 1; } }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .chat { --grey: #3a3a3c; --grey-ink: #98989f; } }
+  :global(:root[data-theme="dark"]) .chat { --grey: #3a3a3c; --grey-ink: #98989f; }
+  @media (prefers-reduced-motion: reduce) {
+    .prow:hover + .chat .q, .prow:hover + .chat .msg, .prow:hover + .chat .delivered { animation: none; opacity: 1; }
+  }
+  @media (max-width: 1239px) { .q, .msg { font-size: 0.8rem; padding: 7px 12px; } }
+  @media (max-width: 1239px) { .peek { --pw: 176px; --ph: 130px; left: calc(100% + 20px); } }
+  @media (max-width: 1019px), (hover: none) { .peek { display: none; } }
+  @media (max-width: 520px) {
+    .right { flex-direction: column; align-items: flex-end; gap: 6px; }
+    .d { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  document.querySelectorAll('.prow').forEach((a, i) => a.addEventListener('mouseenter', () => tick(1400 + i * 120)));
+</script>

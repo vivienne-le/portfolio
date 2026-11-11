@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 400 400" role="img" aria-label="Vl monogram growing like a branch from a sakura blossom">
+<title>Vivienne Le</title>
+<defs>
+<linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" style="stop-color: #FBC6DF"></stop>
+<stop offset="1" style="stop-color: #EE92BE"></stop>
+</linearGradient>
+<radialGradient id="glow1" cx="0.3" cy="0.2" r="0.7">
+<stop offset="0" style="stop-color:#FFFFFF; stop-opacity: 0.6"></stop>
+<stop offset="1" style="stop-color:#FFFFFF;stop-opacity:0"></stop>
+</radialGradient>
+<linearGradient id="ink1" x1="0" y1="80" x2="0" y2="310" gradientUnits="userSpaceOnUse">
+<stop offset="0" style="stop-color:#5151BE"></stop>
+<stop offset="1" style="stop-color:#23236A"></stop>
+</linearGradient>
+<radialGradient id="petal1" cx="0" cy="0" r="56" gradientUnits="userSpaceOnUse">
+<stop offset="0" style="stop-color:#E8337F"></stop>
+<stop offset="0.3" style="stop-color:#F5809F"></stop>
+<stop offset="0.68" style="stop-color:#FBD8D2"></stop>
+<stop offset="1" style="stop-color:#FEF2E8"></stop>
+</radialGradient>
+<linearGradient id="pL1" x1="0" y1="-50" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" style="stop-color:#FCCAD3"></stop>
+<stop offset="0.55" style="stop-color:#F48AA6"></stop>
+<stop offset="1" style="stop-color:#E8457A"></stop>
+</linearGradient>
+<linearGradient id="pD1" x1="0" y1="-50" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" style="stop-color:#F59CB3"></stop>
+<stop offset="0.55" style="stop-color:#EC5F88"></stop>
+<stop offset="1" style="stop-color:#D42A62"></stop>
+</linearGradient>
+<linearGradient id="sun1" x1="0" y1="-18" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" style="stop-color:#FF7D57"></stop>
+<stop offset="1" style="stop-color:#E8337F"></stop>
+</linearGradient>
+<filter id="grain1" x="-10%" y="-10%" width="120%" height="120%">
+<feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="7" result="noise"></feTurbulence>
+<feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  4 0 0 0 -2.2" result="lite"></feColorMatrix>
+<feColorMatrix in="noise" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.05  0 0 0 0 0.25  -4 0 0 0 1.7" result="dark"></feColorMatrix>
+<feComposite in="lite" in2="SourceGraphic" operator="in" result="lite2"></feComposite>
+<feComposite in="dark" in2="SourceGraphic" operator="in" result="dark2"></feComposite>
+<feMerge><feMergeNode in="SourceGraphic"></feMergeNode><feMergeNode in="dark2"></feMergeNode><feMergeNode in="lite2"></feMergeNode></feMerge>
+</filter>
+<filter id="soft1" x="-30%" y="-30%" width="160%" height="160%">
+<feGaussianBlur stdDeviation="7"></feGaussianBlur>
+</filter>
+<filter id="hl1" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur stdDeviation="4"></feGaussianBlur>
+</filter>
+<filter id="drop1" x="-40%" y="-40%" width="180%" height="180%">
+<feDropShadow dx="0" dy="6" stdDeviation="6" style="flood-color:#B0307A;flood-opacity:0.28"></feDropShadow>
+</filter>
+<clipPath id="iconclip"><rect width="400" height="400" rx="89" ry="89"/></clipPath>
+</defs>
+<g clip-path="url(#iconclip)">
+
+<rect width="400" height="400" style="fill:url(#bg1)"></rect>
+<rect width="400" height="400" style="fill:url(#glow1); display: block"></rect>
+
+<path d="M 96 104 L 176 290 C 184 308 200 308 212 290 C 240 244 298 166 298 114 C 298 84 278 74 263 86 C 236 108 230 202 246 250 C 256 278 288 266 312 246" transform="translate(0 12)" style="fill:none;stroke:#3A1A6A;stroke-opacity:0.3;stroke-width:34;stroke-linecap:round;stroke-linejoin:round;filter:url(#soft1)"></path>
+<path d="M 96 104 L 176 290 C 184 308 200 308 212 290 C 240 244 298 166 298 114 C 298 84 278 74 263 86 C 236 108 230 202 246 250 C 256 278 288 266 312 246" style="fill:none;stroke:url(#ink1);stroke-width:34;stroke-linecap:round;stroke-linejoin:round"></path>
+<path d="M 96 104 L 176 290 C 184 308 200 308 212 290 C 240 244 298 166 298 114 C 298 84 278 74 263 86 C 236 108 230 202 246 250 C 256 278 288 266 312 246" transform="translate(-3 -6)" style="fill:none; stroke:#FFFFFF; stroke-opacity: 0.22; stroke-width: 14; stroke-linecap:round; stroke-linejoin:round; filter:url(#hl1)"></path>
+
+</g>
+</svg>

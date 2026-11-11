@@ -1,0 +1,45 @@
+---
+// "What I can help with": a slow marquee of skills. Pauses on hover.
+// With reduced motion it becomes a simple wrapped list.
+import { skills } from '../data/site.js';
+---
+<div class="marquee" aria-label="Skills">
+  <ul class="track">
+    {skills.map((s) => <li>{s}</li>)}
+  </ul>
+  <ul class="track" aria-hidden="true">
+    {skills.map((s) => <li>{s}</li>)}
+  </ul>
+</div>
+
+<style>
+  .marquee {
+    --speed: 48s;
+    display: flex; overflow: hidden; gap: 0;
+    -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .track {
+    list-style: none; margin: 0; padding: 0; display: flex; flex-shrink: 0; gap: 0;
+    animation: scroll var(--speed) linear infinite;
+  }
+  .marquee:hover .track { animation-play-state: paused; }
+  li {
+    display: flex; align-items: center; white-space: nowrap; font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
+    color: var(--ink); padding-right: 22px;
+  }
+  /* Sakura separator, tinted with the blush token */
+  li::after {
+    content: ""; flex: none; width: 1em; height: 1em; margin-left: 22px;
+    background: var(--blush);
+    -webkit-mask: var(--sakura) center / contain no-repeat;
+    mask: var(--sakura) center / contain no-repeat;
+  }
+  @keyframes scroll { to { transform: translateX(-100%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { -webkit-mask: none; mask: none; }
+    .track { animation: none; flex-wrap: wrap; flex-shrink: 1; row-gap: 6px; }
+    .track[aria-hidden="true"] { display: none; }
+    li { font-size: 1rem; }
+  }
+</style>

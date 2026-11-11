@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import Currently from '../components/Currently.astro';
+import ProjectList from '../components/ProjectList.astro';
+import Marquee from '../components/Marquee.astro';
+import Folder from '../components/Folder.astro';
+import Experience from '../components/Experience.astro';
+import Collage from '../components/Collage.astro';
+import Toolbox from '../components/Toolbox.astro';
+import { site, intro, playground } from '../data/site.js';
+---
+<Base current="home">
+  <section class="col hero">
+    <div class="marks">
+      {site.logo
+        ? <img class="logo" src={site.logo} alt={`${site.name} logo`} width="56" height="56" />
+        : <div class="logo logo-ph" aria-hidden="true"><span>logo</span></div>}
+      {site.photo
+        ? <img class="logo photo" src={site.photo} alt={`Photo of ${site.name}`} width="56" height="56" tabindex="0" />
+        : <div class="logo logo-ph" aria-hidden="true"><span>photo</span></div>}
+    </div>
+    <p class="hello label"><span lang="ja">こんにちは</span>, <span lang="de">hallo</span>, <span lang="vi">xin chào</span>, hello</p>
+    <p class="role"><span class="sakura role-flower" aria-hidden="true"></span>{site.role}</p>
+    <h1>I build things with code, then study how they <span class="hand">feel.</span></h1>
+    {intro.map((p) => <p class="lead" set:html={p} />)}
+  </section>
+
+  <section class="col section" aria-labelledby="now-h">
+    <h2 class="section-title" id="now-h">Currently</h2>
+    <Currently />
+  </section>
+
+  <section class="section skills" aria-labelledby="skills-h">
+    <div class="col"><h2 class="section-title" id="skills-h">What I can help with</h2></div>
+    <div class="wide"><Marquee /></div>
+  </section>
+
+  <section class="col section" id="work" aria-labelledby="work-h">
+    <h2 class="section-title" id="work-h">Selected work <span class="label">case studies</span></h2>
+    <ProjectList />
+  </section>
+
+  <section class="col section" id="toolbox" aria-labelledby="tools-h">
+    <h2 class="section-title" id="tools-h">Toolbox <span class="label">software and languages I work with</span></h2>
+    <Toolbox />
+  </section>
+
+  <section class="col section" id="lab-notes" aria-labelledby="play-h">
+    <h2 class="section-title" id="play-h">Play <span class="label">experiments with design and code</span></h2>
+    <div class="folders">
+      {playground.map((f) => <Folder {...f} />)}
+    </div>
+    <a class="more-btn" href="/projects#nursery">See all my passion projects <span class="arrow" aria-hidden="true">→</span><span class="hearts" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></span></a>
+  </section>
+
+  <section class="col section" aria-labelledby="exp-h">
+    <h2 class="sr-only" id="exp-h">Experience</h2>
+    <Experience />
+  </section>
+
+  <section class="wide section" aria-labelledby="col-h">
+    <div class="col"><h2 class="section-title" id="col-h">Off screen</h2></div>
+    <Collage />
+  </section>
+</Base>
+
+<style>
+  .hero { display: grid; gap: 0; }
+  .marks { display: flex; gap: 12px; margin-bottom: 22px; }
+  .logo { width: 56px; height: 56px; border-radius: 16px; object-fit: contain; }
+  /* Photo: grows on hover (or tap / keyboard focus) so people can see your face */
+  .marks { position: relative; z-index: 5; }
+  .photo {
+    object-fit: cover; position: relative; cursor: zoom-in;
+    transform-origin: top left; transition: transform var(--d-object) var(--spring), box-shadow var(--d-move), border-radius var(--d-move);
+  }
+  .photo:hover, .photo:focus-visible, .photo.big {
+    transform: scale(3.2) rotate(-2deg); border-radius: 8px; z-index: 10;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 18px 40px -12px rgba(0, 0, 0, 0.45);
+  }
+  .photo:focus-visible { outline: 2px solid var(--dot); outline-offset: 1px; }
+  /* Placeholder until the new logo is ready */
+  .logo-ph {
+    display: grid; place-items: center; border: 1.5px dashed var(--ink-3);
+    background: repeating-linear-gradient(135deg, var(--paper-2) 0 6px, transparent 6px 12px);
+  }
+  .logo-ph span { font: 400 0.6rem/1 var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .hello { margin-bottom: 14px; }
+  .role { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+  .role-flower { font-size: 1.05rem; }
+  h1 { font-size: var(--text-l); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 18px; }
+  h1 .hand { color: var(--dot); }
+  .lead { max-width: 34rem; }
+  /* Highlighter marks: swept in one after another when the page loads */
+  .lead :global(mark) {
+    color: var(--ink); padding: 0 2px; margin: 0 -2px; border-radius: 3px;
+    background: linear-gradient(104deg, transparent 0.4em, var(--highlight) 0.5em, var(--highlight) calc(100% - 0.3em), transparent calc(100% - 0.2em)) no-repeat 0 62% / 100% 58%;
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+    animation: mark-in 700ms var(--ease-out) both;
+  }
+  .lead:first-of-type :global(mark:nth-of-type(1)) { animation-delay: 350ms; }
+  .lead:first-of-type :global(mark:nth-of-type(2)) { animation-delay: 550ms; }
+  .lead:nth-of-type(2) :global(mark:nth-of-type(1)) { animation-delay: 750ms; }
+  .lead:nth-of-type(2) :global(mark:nth-of-type(2)) { animation-delay: 950ms; }
+  @keyframes mark-in { from { background-size: 0% 58%; } }
+  .folders { display: flex; flex-wrap: wrap; gap: 32px 40px; padding: 84px 0 8px; } /* room above for the folders' chat bubbles */
+  /* Button below Play that leads to the passion projects page */
+  .more-btn {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 28px;
+    padding: 11px 16px; border-radius: 999px; text-decoration: none;
+    font: 500 0.85rem/1 var(--sans); color: var(--ink);
+    background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow);
+    transition: transform var(--d-move) var(--spring), background var(--d-colour);
+  }
+  .more-btn .arrow { transition: transform var(--d-move) var(--spring); }
+  .more-btn:hover { background: var(--navy-soft); transform: translateY(-2px); }
+  .more-btn:hover .arrow { transform: translateX(3px); }
+  /* Hearts float up on hover, the same ones as on the passion projects page */
+  .more-btn { position: relative; --heart: #ec5f86; }
+  :global(:root[data-theme="dark"]) .more-btn { --heart: #ff8fb0; }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .more-btn { --heart: #ff8fb0; } }
+  .more-btn .hearts { position: absolute; top: -2px; right: 18px; pointer-events: none; }
+  .more-btn .hearts i {
+    position: absolute; right: 0; top: 0; font-style: normal; font-size: 17px; line-height: 1;
+    color: var(--heart); opacity: 0; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+  }
+  .more-btn .hearts i:nth-child(2) { right: 14px; font-size: 13px; }
+  .more-btn .hearts i:nth-child(3) { right: -8px; font-size: 11px; }
+  .more-btn:hover .hearts i, .more-btn:focus-visible .hearts i { animation: heart 1500ms var(--ease-out) forwards; }
+  .more-btn:hover .hearts i:nth-child(2), .more-btn:focus-visible .hearts i:nth-child(2) { animation-delay: 180ms; }
+  .more-btn:hover .hearts i:nth-child(3), .more-btn:focus-visible .hearts i:nth-child(3) { animation-delay: 360ms; }
+  @keyframes heart {
+    0% { opacity: 0; translate: 0 8px; scale: 0.5; }
+    15% { opacity: 1; scale: 1.15; }
+    70% { opacity: 1; }
+    100% { opacity: 0; translate: 8px -40px; scale: 0.9; }
+  }
+  @media (prefers-reduced-motion: reduce) { .more-btn:hover .hearts i { animation: none; } }
+  .more-btn:active { transform: translateY(0) scale(0.98); }
+  @media (max-width: 640px) {
+    .folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .folders :global(.folder) { zoom: 0.6; }
+  }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  // Touch screens: tap the photo to make it bigger, tap anywhere to shrink it again
+  const photo = document.querySelector('.hero .photo');
+  if (photo) {
+    photo.addEventListener('click', (e) => { if (matchMedia('(hover: none)').matches) { e.stopPropagation(); photo.classList.toggle('big'); } });
+    document.addEventListener('click', () => photo.classList.remove('big'));
+  }
+  // Touch screens have no hover, so a tap opens a folder.
+  // Folders without a link toggle open/closed on each tap and never navigate.
+  // Folders with a link open on the first tap and follow the link on the second.
+  document.querySelectorAll('.folder').forEach((f, i) => {
+    // The same soft blip as the rest of the site when a folder opens (only if sound is on)
+    const blip = () => tick(1250 + i * 130);
+    f.addEventListener('mouseenter', blip);
+    f.addEventListener('focus', blip);
+    f.addEventListener('click', (e) => {
+      const touch = matchMedia('(hover: none)').matches;
+      if (f.tagName === 'BUTTON') {
+        if (!touch) return;
+        const open = !f.classList.contains('open');
+        if (open) blip();
+        f.classList.toggle('open', open);
+        f.setAttribute('aria-pressed', String(open));
+        return;
+      }
+      if (touch && !f.classList.contains('open')) {
+        e.preventDefault();
+        blip();
+        f.classList.add('open');
+      }
+    });
+  });
+</script>

@@ -1,0 +1,204 @@
+---
+// Finder-style photo folders (About page).
+// Semi-transparent glass folders with emoji stickers. Hover: the photos inside peek out.
+// Click: the photos are laid out on the page below. Hover a photo: it grows a little.
+// Edit the folders and photos in src/data/site.js → aboutAlbums.
+import { aboutAlbums } from '../data/site.js';
+const tilts = [-7, 4, -3, 6, -5, 3, -6, 5];
+---
+<div class="albums">
+  <div class="folders" role="list">
+    {aboutAlbums.map((a, i) => {
+      const slots = a.photos.length === 1 ? [1] : a.photos.length === 2 ? [0, 2] : [0, 1, 2];   // only real photos, centred
+      const peek = slots.map((slot, k) => ({ slot, p: a.photos[k] }));
+      return (
+        <div role="listitem">
+          <button class="album" type="button" aria-expanded="false" aria-controls="album-view" data-album={i}>
+            <span class="art" aria-hidden="true">
+              <span class="back"></span>
+              <span class="peek">
+                {peek.map(({ slot, p }) => (
+                  <span class={`card c${slot}`}><img src={p.src} alt="" loading="lazy" decoding="async" /></span>
+                ))}
+              </span>
+              <span class="front">
+                {a.stickers?.[0] && <span class="sticker s1">{a.stickers[0]}</span>}
+                {a.stickers?.[1] && <span class="sticker s2">{a.stickers[1]}</span>}
+                <span class="ridge"></span>
+              </span>
+            </span>
+            <span class="name">{a.title}</span>
+            <span class="count">{a.photos.length} {a.photos.length === 1 ? 'photo' : 'photos'}</span>
+          </button>
+        </div>
+      );
+    })}
+  </div>
+
+  <section class="view" id="album-view" aria-live="polite" hidden>
+    <div class="view-head">
+      <h2 class="view-title" tabindex="-1"></h2>
+      <button class="view-close" type="button" aria-label="Close photos">×</button>
+    </div>
+    {aboutAlbums.map((a, i) => (
+      <ul class="spread" data-spread={i} hidden>
+        {a.photos.map((p, k) => (
+          <li style={`--tilt:${tilts[k % tilts.length]}deg; --d:${k * 70}ms`}>
+            <figure class="print"><img src={p.src} alt={p.alt} loading="lazy" decoding="async" /></figure>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </section>
+</div>
+
+<style>
+  .albums { --glass: rgba(255, 255, 255, 0.5); --glass-rim: rgba(255, 255, 255, 0.85); --back: #e4e5ea; --ridge: rgba(0, 0, 0, 0.06); }
+  :global(:root[data-theme="dark"]) .albums { --glass: rgba(255, 255, 255, 0.1); --glass-rim: rgba(255, 255, 255, 0.22); --back: #2b2830; --ridge: rgba(255, 255, 255, 0.08); }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .albums { --glass: rgba(255, 255, 255, 0.1); --glass-rim: rgba(255, 255, 255, 0.22); --back: #2b2830; --ridge: rgba(255, 255, 255, 0.08); }
+  }
+
+  .folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; padding-top: 34px; }
+  .album {
+    all: unset; box-sizing: border-box; cursor: pointer; width: 100%;
+    display: grid; justify-items: center; gap: 6px; padding: 6px 4px 10px; border-radius: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .album:focus-visible { outline: 2px solid var(--dot); outline-offset: 2px; }
+
+  /* The folder drawing */
+  .art { position: relative; display: block; width: 168px; height: 138px; }
+  .back {
+    position: absolute; left: 6px; right: 6px; top: 20px; bottom: 6px; border-radius: 12px;
+    background: var(--back);
+  }
+  .back::before {   /* the folder tab */
+    content: ""; position: absolute; left: 0; top: -10px; width: 46%; height: 18px;
+    border-radius: 10px 12px 0 0; background: inherit;
+  }
+
+  /* Photos waiting inside the folder */
+  .peek { position: absolute; inset: 0; }
+  .card {
+    position: absolute; left: 50%; top: 18px; width: 64px; height: 78px; margin-left: -32px;
+    padding: 3px; border-radius: 8px; background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    transition: transform 0.5s var(--spring);
+  }
+  .card img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
+  .c0 { transform: translate(-30px, 12px) rotate(-9deg); }
+  .c1 { transform: translate(0, 2px); z-index: 1; }
+  .c2 { transform: translate(30px, 12px) rotate(9deg); }
+  .album:hover .c0, .album:focus-visible .c0, .album.active .c0 { transform: translate(-44px, -8px) rotate(-15deg); }
+  .album:hover .c1, .album:focus-visible .c1, .album.active .c1 { transform: translate(0, -22px) rotate(-2deg); }
+  .album:hover .c2, .album:focus-visible .c2, .album.active .c2 { transform: translate(44px, -8px) rotate(14deg); }
+  .album:hover .c1, .album.active .c1 { transition-delay: 40ms; }
+
+  /* Frosted glass front */
+  .front {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 96px; z-index: 2; border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 40%), var(--glass);
+    -webkit-backdrop-filter: blur(10px) saturate(1.5); backdrop-filter: blur(10px) saturate(1.5);
+    border: 1px solid var(--glass-rim);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7), 0 10px 24px -14px rgba(0, 0, 0, 0.35);
+    transition: transform 0.5s var(--spring);
+  }
+  .album:hover .front, .album.active .front { transform: translateY(2px); }
+  .ridge {   /* the soft lines along the bottom of a Finder folder */
+    position: absolute; left: 10px; right: 10px; bottom: 9px; height: 5px;
+    border-top: 1px solid var(--ridge); border-bottom: 1px solid var(--ridge);
+  }
+
+  /* Emoji stickers: white outline + tiny shadow, like stickers on the glass */
+  .sticker {
+    position: absolute; font-size: 28px; line-height: 1;
+    filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+    transition: transform 0.5s var(--spring);
+  }
+  .s1 { left: 22px; top: 22px; transform: rotate(-10deg); }
+  .s2 { right: 22px; top: 36px; transform: rotate(8deg); }
+  .album:hover .s1 { transform: rotate(-16deg) scale(1.08); }
+  .album:hover .s2 { transform: rotate(14deg) scale(1.08); }
+
+  .name { font: 500 0.88rem/1.2 var(--sans); color: var(--ink); margin-top: 4px; text-align: center; }
+  .count {
+    font: 400 0.68rem/1 var(--mono); color: var(--ink-2);
+    padding: 4px 8px; border-radius: 999px; background: var(--paper-2);
+  }
+  .album.active .count { background: var(--navy-soft); color: var(--ink); }
+
+  /* The photos, laid out on the page */
+  .view { margin-top: 18px; }
+  .view-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .view-title { font-size: 1rem; font-weight: 500; margin: 0; }
+  .view-title:focus { outline: none; }
+  .view-close {
+    all: unset; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 1.2rem; color: var(--ink-2); background: var(--paper-2);
+  }
+  .view-close:hover { color: var(--ink); }
+  .view-close:focus-visible { outline: 2px solid var(--dot); outline-offset: 2px; }
+  .spread {
+    list-style: none; margin: 0; padding: 16px 4px 8px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 22px 18px;
+  }
+  .spread[hidden] { display: none; }
+  .spread li { opacity: 0; transform: translateY(24px) rotate(0deg) scale(0.9); }
+  .spread.show li {
+    opacity: 1; transform: rotate(var(--tilt));
+    transition: opacity 0.35s var(--ease-out) var(--d), transform 0.6s var(--spring) var(--d);
+  }
+  .print {
+    margin: 0; padding: 6px 6px 22px; background: #fff; border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 14px 28px -14px rgba(0, 0, 0, 0.35);
+    transition: transform 0.35s var(--spring), box-shadow 0.35s var(--ease-out);
+  }
+  .print img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 3px; }
+  .spread.show li:hover { transform: rotate(0deg) scale(1.08); z-index: 2; position: relative; transition-delay: 0s; }
+  .spread li:hover .print { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 24px 40px -16px rgba(0, 0, 0, 0.45); }
+
+  @media (max-width: 560px) {
+    .art { transform: scale(0.72); margin: -18px -24px -20px; }
+    .folders { gap: 4px; padding-top: 22px; }
+    .spread { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card, .front, .sticker, .print { transition: none; }
+    .spread li, .spread.show li { transition: none; opacity: 1; transform: none; }
+  }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  const albums = [...document.querySelectorAll('.album')];
+  const view = document.getElementById('album-view');
+  if (view) {
+    const title = view.querySelector('.view-title');
+    const spreads = [...view.querySelectorAll('.spread')];
+    let current = -1;
+    const close = () => {
+      current = -1; view.hidden = true;
+      albums.forEach((a) => { a.classList.remove('active'); a.setAttribute('aria-expanded', 'false'); });
+      spreads.forEach((s) => { s.hidden = true; s.classList.remove('show'); });
+    };
+    const openAlbum = (i) => {
+      if (current === i) { const a = albums[i]; close(); a.focus(); return; }
+      current = i; view.hidden = false;
+      albums.forEach((a, k) => { a.classList.toggle('active', k === i); a.setAttribute('aria-expanded', String(k === i)); });
+      const a = albums[i];
+      title.textContent = `${a.querySelector('.name').textContent} · ${a.querySelector('.count').textContent}`;
+      spreads.forEach((s, k) => { s.hidden = k !== i; s.classList.remove('show'); });
+      requestAnimationFrame(() => requestAnimationFrame(() => spreads[i].classList.add('show')));
+      [1500, 1800].forEach((p, k) => setTimeout(() => tick(p), k * 80));
+      title.focus({ preventScroll: true });
+      view.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+    };
+    albums.forEach((a, i) => {
+      a.addEventListener('click', () => openAlbum(i));
+      a.addEventListener('mouseenter', () => tick(1300 + i * 140));
+    });
+    view.querySelector('.view-close').addEventListener('click', () => { const a = albums[current]; close(); a?.focus(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && current !== -1) { const a = albums[current]; close(); a?.focus(); } });
+  }
+</script>

@@ -1,0 +1,279 @@
+---
+// "Off screen": a sticker collection on dotted journal paper.
+// Grab a sticker and it peels up from the side you grabbed, then sticks down again where you drop it.
+// Mouse: just drag. Touch: press and hold, then drag. Keyboard: focus a sticker and use the arrow keys.
+// "Tidy up" puts every sticker back. Edit the stickers in `stickers` in src/data/site.js.
+import { stickers } from '../data/site.js';
+---
+<div class="board" data-board>
+  <button class="tidy label" type="button" hidden>tidy up</button>
+  <p class="hint hand" aria-hidden="true">peel me ↗</p>
+  {stickers.map((s, i) => (
+    <figure
+      class="sticker"
+      style={`--x0:${s.x}%;--y0:${s.y}%;--mx0:${s.mx ?? s.x}%;--my0:${s.my ?? s.y}%;--w:${s.w}%;--r:${s.r ?? 0}deg`}
+      data-i={i}
+      tabindex="0"
+      aria-label={`Sticker: ${s.alt}. Drag, or use the arrow keys, to move it.`}
+    >
+      <span class="peel">
+        <img src={s.src} alt="" loading="lazy" decoding="async" draggable="false" />
+        <span class="sheen" aria-hidden="true"></span>
+      </span>
+    </figure>
+  ))}
+</div>
+
+<style>
+  /* Dotted journal paper */
+  .board {
+    position: relative; max-width: 50rem; margin-inline: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-l);
+    background-color: var(--paper);
+    background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1.1px, transparent 1.6px);
+    background-size: 18px 18px;
+    background-position: 9px 9px;
+    border: 1px solid var(--line);
+    overflow: hidden; /* stickers stay on the paper */
+  }
+  .hint {
+    position: absolute; left: 18px; bottom: 12px; margin: 0; color: var(--muted, #8a8a8a);
+    font-size: 1.05rem; transform: rotate(-4deg); pointer-events: none;
+  }
+
+  .sticker {
+    position: absolute; margin: 0;
+    left: var(--x0); top: var(--y0); width: var(--w);
+    translate: var(--x, 0px) var(--y, 0px);
+    transform: rotate(var(--r));
+    transition: translate var(--d-object) var(--spring), transform var(--d-object) var(--spring);
+    cursor: grab; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    touch-action: pan-y;
+    outline: none;
+  }
+  /* The part that peels: tilts up from the side you grab (set by --rx / --ry in the script) */
+  .peel {
+    display: block; position: relative;
+    transform-origin: var(--ox, 50%) var(--oy, 50%);
+    transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(var(--s, 1));
+    transition: transform var(--d-move) var(--ease-out), filter var(--d-move) var(--ease-out);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.16)) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.07));
+  }
+  .peel img { display: block; width: 100%; height: auto; pointer-events: none; }
+  /* A glossy streak that slides across while the sticker is lifted */
+  .sheen {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    -webkit-mask: var(--mask) center / 100% 100% no-repeat; mask: var(--mask) center / 100% 100% no-repeat;
+    background: linear-gradient(var(--sa, 120deg), transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 62%);
+    transition: opacity var(--d-move) var(--ease-out);
+  }
+
+  .sticker:hover .peel { --s: 1.03; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.14)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.1)); }
+  .sticker:focus-visible .peel { outline: 2px solid var(--dot); outline-offset: 4px; border-radius: 12px; }
+  .sticker.lifted { z-index: 100 !important; }
+  .sticker.dragging { cursor: grabbing; transition: transform var(--d-move) var(--ease-out); transform: rotate(calc(var(--r) * 0.5)); }
+  .sticker.dragging .peel {
+    --s: 1.08;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.12)) drop-shadow(0 22px 22px rgba(0, 0, 0, 0.28));
+  }
+  .sticker.dragging .sheen { opacity: 1; }
+  /* Sticking it back down: a tiny press */
+  .sticker.stuck .peel { animation: stick 360ms var(--ease-out); }
+  @keyframes stick {
+    0% { transform: perspective(700px) scale(1.06); }
+    55% { transform: perspective(700px) scale(0.97); }
+    100% { transform: perspective(700px) scale(1); }
+  }
+
+  .tidy {
+    position: absolute; top: 10px; right: 12px; z-index: 101;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; cursor: pointer;
+    transition: color var(--d-colour);
+  }
+  .tidy:hover { color: var(--ink); }
+
+  @media (max-width: 640px) {
+    .board { aspect-ratio: 4 / 5; }
+    .sticker { left: var(--mx0); top: var(--my0); width: calc(var(--w) * 1.6); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .peel { transform: none !important; }
+    .sticker.stuck .peel { animation: none; }
+  }
+</style>
+
+<script>
+  import { tick, reduceMotion } from '../scripts/sound.js';
+
+  const board = document.querySelector('[data-board]');
+  const items = [...board.querySelectorAll('.sticker')];
+  const tidy = board.querySelector('.tidy');
+  const hint = board.querySelector('.hint');
+  const KEY = 'sticker-positions';
+  let z = 1;
+  const pos = new Map(); // index -> {x, y}
+
+  // The sheen only shows on the sticker itself, not around it
+  items.forEach((s) => {
+    const img = s.querySelector('img');
+    s.querySelector('.sheen').style.setProperty('--mask', `url("${img.currentSrc || img.src}")`);
+  });
+
+  function apply(el, x, y) {
+    el.style.setProperty('--x', `${x}px`);
+    el.style.setProperty('--y', `${y}px`);
+    pos.set(el.dataset.i, { x, y });
+  }
+  const bringToFront = (el) => (el.style.zIndex = String(++z));
+
+  // Keep a sticker mostly on the paper (a little may hang over the edge, like a real one)
+  function clamp(el, x, y) {
+    const b = board.getBoundingClientRect();
+    const t = el.getBoundingClientRect();
+    const cur = pos.get(el.dataset.i) || { x: 0, y: 0 };
+    const homeLeft = t.left - cur.x, homeTop = t.top - cur.y;
+    const hang = 0.3; // how much of a sticker can go past the edge
+    const minX = b.left - t.width * hang - homeLeft, maxX = b.right - t.width * (1 - hang) - homeLeft;
+    const minY = b.top - t.height * hang - homeTop, maxY = b.bottom - t.height * (1 - hang) - homeTop;
+    return { x: Math.min(maxX, Math.max(minX, x)), y: Math.min(maxY, Math.max(minY, y)) };
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(Object.fromEntries(pos))); } catch {}
+    const moved = [...pos.values()].some((p) => p.x || p.y);
+    tidy.hidden = !moved;
+    if (hint) hint.hidden = moved;
+  }
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+    items.forEach((s) => {
+      const p = saved[s.dataset.i];
+      if (p) { s.style.transition = 'none'; const c = clamp(s, p.x, p.y); apply(s, c.x, c.y); }
+    });
+    requestAnimationFrame(() => items.forEach((s) => (s.style.transition = '')));
+    save();
+  } catch {}
+
+  // Peel up from the point you grabbed: that side lifts toward you, the far side stays down
+  function peelFrom(el, cx, cy) {
+    if (reduceMotion()) return;
+    const r = el.getBoundingClientRect();
+    const dx = (cx - (r.left + r.width / 2)) / (r.width / 2);   // -1 (left) … 1 (right)
+    const dy = (cy - (r.top + r.height / 2)) / (r.height / 2);  // -1 (top) … 1 (bottom)
+    const p = el.querySelector('.peel');
+    p.style.setProperty('--ry', `${Math.max(-1, Math.min(1, dx)) * 22}deg`);
+    p.style.setProperty('--rx', `${Math.max(-1, Math.min(1, -dy)) * 22}deg`);
+    p.style.setProperty('--ox', `${50 - dx * 50}%`); // hinge on the opposite side
+    p.style.setProperty('--oy', `${50 - dy * 50}%`);
+    p.querySelector('.sheen').style.setProperty('--sa', `${Math.atan2(dy, dx) * 57.3 + 90}deg`);
+  }
+  function flatten(el) {
+    const p = el.querySelector('.peel');
+    ['--rx', '--ry'].forEach((k) => p.style.setProperty(k, '0deg'));
+  }
+
+  function startDrag(el, sx, sy) {
+    const origin = pos.get(el.dataset.i) || { x: 0, y: 0 };
+    el.classList.remove('stuck');
+    el.classList.add('dragging', 'lifted');
+    peelFrom(el, sx, sy);
+    bringToFront(el);
+    tick(1500);
+    let lastX = sx;
+    return {
+      move(cx, cy) {
+        const c = clamp(el, origin.x + cx - sx, origin.y + cy - sy);
+        apply(el, c.x, c.y);
+        // swing a little with the movement, like a loose sticker
+        const v = Math.max(-1, Math.min(1, (cx - lastX) / 12));
+        lastX = cx;
+        el.querySelector('.peel').style.setProperty('--ry', `${v * 18}deg`);
+      },
+      end() {
+        flatten(el);
+        el.classList.remove('dragging', 'held');
+        void el.offsetWidth;
+        el.classList.add('stuck');
+        setTimeout(() => el.classList.remove('lifted'), 0);
+        tick(1100);
+        save();
+      },
+    };
+  }
+
+  items.forEach((el) => {
+    // Mouse and pen: drag straight away
+    el.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch' || e.button !== 0) return;
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      const sx = e.clientX, sy = e.clientY;
+      let drag = null;
+      const onMove = (ev) => {
+        if (!drag && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 3) return;
+        if (!drag) drag = startDrag(el, sx, sy);
+        drag.move(ev.clientX, ev.clientY);
+      };
+      const onUp = () => {
+        el.removeEventListener('pointermove', onMove);
+        el.removeEventListener('pointerup', onUp);
+        el.removeEventListener('pointercancel', onUp);
+        if (drag) drag.end();
+      };
+      el.addEventListener('pointermove', onMove);
+      el.addEventListener('pointerup', onUp);
+      el.addEventListener('pointercancel', onUp);
+    });
+
+    // Touch: press and hold to peel, so normal swipes still scroll the page
+    let holdTimer = null, drag = null, sx = 0, sy = 0;
+    el.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+      holdTimer = setTimeout(() => {
+        el.classList.add('held');
+        navigator.vibrate?.(8);
+        drag = startDrag(el, sx, sy);
+      }, 220);
+    }, { passive: true });
+    el.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (drag) { e.preventDefault(); drag.move(t.clientX, t.clientY); return; }
+      if (Math.hypot(t.clientX - sx, t.clientY - sy) > 8) clearTimeout(holdTimer);
+    }, { passive: false });
+    const endTouch = () => { clearTimeout(holdTimer); if (drag) { drag.end(); drag = null; } };
+    el.addEventListener('touchend', endTouch);
+    el.addEventListener('touchcancel', endTouch);
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Keyboard: arrow keys move the focused sticker (hold Shift for bigger steps)
+    el.addEventListener('keydown', (e) => {
+      const step = e.shiftKey ? 40 : 10;
+      const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+      if (!d) return;
+      e.preventDefault();
+      bringToFront(el);
+      const cur = pos.get(el.dataset.i) || { x: 0, y: 0 };
+      const c = clamp(el, cur.x + d[0], cur.y + d[1]);
+      apply(el, c.x, c.y);
+      save();
+    });
+  });
+
+  tidy.addEventListener('click', () => {
+    items.forEach((s) => { apply(s, 0, 0); s.style.zIndex = ''; });
+    pos.clear();
+    save();
+    tick(1700);
+  });
+
+  // Positions are in pixels, so start fresh when the paper changes size a lot (e.g. phone rotation)
+  let lastW = board.offsetWidth;
+  addEventListener('resize', () => {
+    if (Math.abs(board.offsetWidth - lastW) < 40) return;
+    lastW = board.offsetWidth;
+    items.forEach((s) => { const p = pos.get(s.dataset.i); if (p) { const c = clamp(s, p.x, p.y); apply(s, c.x, c.y); } });
+  });
+</script>

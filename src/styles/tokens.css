@@ -1,0 +1,99 @@
+/* ─────────────────────────────────────────────────────────────
+   Design tokens. Change a value here and the whole site follows.
+   Light values on :root, dark values in the two blocks below
+   (system dark mode, and an explicit data-theme="dark").
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Colour: quiet neutrals, navy leads, blush supports */
+  --paper: #fafaf9;
+  --paper-2: #f2f1f0;
+  --ink: #1c1b1f;
+  --ink-2: #5e5a62;   /* secondary text, ≥ 6:1 on paper */
+  --ink-3: #8e8992;   /* decorative only, not for reading */
+  --line: rgba(28, 27, 31, 0.09);
+  --grid-dot: rgba(28, 27, 31, 0.2);   /* dotted journal paper */
+
+  --navy: #1d2b4f;
+  --navy-2: #2b3c66;
+  --navy-soft: #e4e9f5;
+  --on-navy: #edf0f8;
+  --dot: var(--navy);   /* jumping nav dot, focus accents */
+
+  --blush: #f4b9b6;
+  --blush-soft: #fbe3e2;
+  --blush-ink: #9e3a37;
+  --highlight: rgba(244, 185, 182, 0.55);   /* highlighter marks in text */
+
+  --stamp: #f7f1e3;
+  --note: #fbe38a;
+  --note-ink: #3d3410;
+
+  --lilac: #f4dcfa;  --lilac-ink: #7e2896;
+  --mint: #e2f6e0;   --mint-ink: #2c6b30;
+  --butter: #fcf1d6; --butter-ink: #7a5200;
+  --sky: #dee9fc;    --sky-ink: #2a4fb8;
+  --peach: #fde4d3;  --peach-ink: #9a4a12;
+  --teal: #d5f1ee;   --teal-ink: #1d6b63;
+  --clay: #ece5df;   --clay-ink: #6b5546;
+  --data-ink: #1d2b4f;   /* text on the Data / ML chip */
+  --client: #1d2b4f; --client-ink: #edf0f8;   /* Client project chip */
+
+  --shadow: 0 1px 2px rgba(28, 27, 31, 0.06), 0 8px 24px -8px rgba(28, 27, 31, 0.18);
+
+  /* Shapes */
+  --sakura: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' transform='rotate(0 12 12)' d='M12 12C9.2 9.4 8.6 5 10.4 2.6L12 4.2l1.6-1.6C15.4 5 14.8 9.4 12 12Z'/%3E%3Cpath fill='%23000' transform='rotate(72 12 12)' d='M12 12C9.2 9.4 8.6 5 10.4 2.6L12 4.2l1.6-1.6C15.4 5 14.8 9.4 12 12Z'/%3E%3Cpath fill='%23000' transform='rotate(144 12 12)' d='M12 12C9.2 9.4 8.6 5 10.4 2.6L12 4.2l1.6-1.6C15.4 5 14.8 9.4 12 12Z'/%3E%3Cpath fill='%23000' transform='rotate(216 12 12)' d='M12 12C9.2 9.4 8.6 5 10.4 2.6L12 4.2l1.6-1.6C15.4 5 14.8 9.4 12 12Z'/%3E%3Cpath fill='%23000' transform='rotate(288 12 12)' d='M12 12C9.2 9.4 8.6 5 10.4 2.6L12 4.2l1.6-1.6C15.4 5 14.8 9.4 12 12Z'/%3E%3Ccircle cx='12' cy='12' r='1.6' fill='%23000' fill-opacity='.35'/%3E%3C/svg%3E");   /* five-petal blossom, used as a mask */
+
+  /* Type */
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --hand: "Caveat Brush", "Segoe Print", "Bradley Hand", cursive;
+  --text-s: 0.8125rem;
+  --text-m: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+  --text-l: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
+
+  /* Space and layout */
+  --col: 37.5rem;     /* reading column */
+  --wide: 60rem;      /* breakout for media */
+  --gutter: max(20px, env(safe-area-inset-left, 0px));
+  --section: clamp(64px, 8vw, 104px);
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 20px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: linear(0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001 85.9%, 1);
+  --d-colour: 160ms;
+  --d-move: 280ms;
+  --d-reveal: 360ms;
+  --d-object: 640ms;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131015; --paper-2: #1d1920; --ink: #f2eef3; --ink-2: #ada6b1; --ink-3: #7f7883;
+    --line: rgba(242, 238, 243, 0.1); --grid-dot: rgba(242, 238, 243, 0.18);
+    --navy: #26386a; --navy-2: #31457c; --navy-soft: #26304a; --on-navy: #edf0f8; --dot: #f6bdd4;
+    --blush: #f6bdd4; --blush-soft: #3a2230; --blush-ink: #f7c1d6; --highlight: rgba(246, 189, 212, 0.28);
+    --stamp: #efe8d8; --note: #e8cf6a;
+    --lilac: #34223b; --lilac-ink: #e3b8f0; --mint: #1d3320; --mint-ink: #a9dda6;
+    --butter: #3a3018; --butter-ink: #f0d58e; --sky: #1e2a44; --sky-ink: #a9c2f5;
+    --peach: #3b2618; --peach-ink: #f5c09a; --teal: #173431; --teal-ink: #9fdcd4; --clay: #2e2824; --clay-ink: #d6c3b4; --data-ink: #c3cdea; --client: #e4e9f5; --client-ink: #1d2b4f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -8px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131015; --paper-2: #1d1920; --ink: #f2eef3; --ink-2: #ada6b1; --ink-3: #7f7883;
+  --line: rgba(242, 238, 243, 0.1); --grid-dot: rgba(242, 238, 243, 0.18);
+  --navy: #26386a; --navy-2: #31457c; --navy-soft: #26304a; --on-navy: #edf0f8; --dot: #f6bdd4;
+  --blush: #f6bdd4; --blush-soft: #3a2230; --blush-ink: #f7c1d6; --highlight: rgba(246, 189, 212, 0.28);
+  --stamp: #efe8d8; --note: #e8cf6a;
+  --lilac: #34223b; --lilac-ink: #e3b8f0; --mint: #1d3320; --mint-ink: #a9dda6;
+  --butter: #3a3018; --butter-ink: #f0d58e; --sky: #1e2a44; --sky-ink: #a9c2f5;
+    --peach: #3b2618; --peach-ink: #f5c09a; --teal: #173431; --teal-ink: #9fdcd4; --clay: #2e2824; --clay-ink: #d6c3b4; --data-ink: #c3cdea; --client: #e4e9f5; --client-ink: #1d2b4f;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -8px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}

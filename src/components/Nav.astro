@@ -1,0 +1,174 @@
+---
+// Pill navigation. A dot sits above the active item and jumps (out of the frame)
+// to whichever item you hover. On phones the nav becomes a dock at the bottom.
+import { site } from '../data/site.js';
+const { current = 'home' } = Astro.props;
+const items = [
+  { id: 'work', label: 'Work', href: '/#work' },
+  { id: 'lab', label: 'Play', href: '/projects' },
+  { id: 'about', label: 'About', href: '/about' },
+];
+---
+<nav class="snav" aria-label="Main" data-current={current}>
+  <span class="pill" aria-hidden="true"></span>
+  <span class="jdot" aria-hidden="true"></span>
+  <a class="item home" href="/" data-id="home" aria-current={current === 'home' ? 'page' : undefined}>
+    {site.logo
+      ? <img class="mark" src={site.logo} alt="" width="24" height="24" />
+      : <span class="mark mark-ph" aria-hidden="true"></span>}
+    <span class="sr-only">Home</span>
+  </a>
+  {items.map((i) => (
+    <a class="item" href={i.href} data-id={i.id} aria-current={current === i.id ? 'page' : undefined}>{i.label}</a>
+  ))}
+  <button class="item sound" type="button" aria-pressed="false" aria-label="Interface sounds">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M11 5 6 9H3v6h3l5 4z" />
+      <path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+      <path class="mute" d="M16 9l5 6M21 9l-5 6" />
+    </svg>
+  </button>
+</nav>
+
+<style>
+  .snav {
+    position: fixed; z-index: 40; left: 50%; top: calc(40px + env(safe-area-inset-top, 0px)); /* room above for the dot's jump */
+    translate: -50% 0;
+    display: flex; align-items: center; gap: 2px; padding: 4px;
+    border-radius: 999px; background: color-mix(in srgb, var(--paper) 82%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .item {
+    position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center;
+    font: 500 0.85rem/1 var(--sans); color: var(--ink-2); text-decoration: none;
+    background: none; border: 0; cursor: pointer;
+    padding: 15px 14px 11px; border-radius: 999px; transition: color var(--d-colour);
+  }
+  .item:hover, .item[aria-current="page"], .item.is-current { color: var(--ink); }
+  .home { padding-inline: 10px; flex-shrink: 0; }
+  .mark { display: block; flex-shrink: 0; width: 24px; height: 24px; margin-top: -4px; border-radius: 8px; object-fit: contain; }
+  /* Placeholder until the logo is ready (uses site.logo from src/data/site.js) */
+  .mark-ph {
+    border: 1.5px dashed var(--ink-3);
+    background: repeating-linear-gradient(135deg, var(--paper-2) 0 4px, transparent 4px 8px);
+  }
+  .sound { padding-inline: 12px; color: var(--ink-3); }
+  .sound[aria-pressed="true"] { color: var(--dot); }
+  .sound .wave { display: none; }
+  .sound[aria-pressed="true"] .wave { display: inline; }
+  .sound[aria-pressed="true"] .mute { display: none; }
+  .pill {
+    position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px;
+    background: var(--navy-soft); opacity: 0;
+    transition: transform var(--d-object) var(--spring), width var(--d-object) var(--spring), opacity var(--d-move);
+  }
+  .pill.on { opacity: 1; }
+  .jdot {
+    position: absolute; top: 7px; left: 0; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--dot); z-index: 2; pointer-events: none; opacity: 0;
+    transition: opacity var(--d-move);
+  }
+  .jdot.on { opacity: 1; }
+
+  /* Phone: dock at the bottom, within thumb reach */
+  @media (max-width: 640px) {
+    .snav {
+      top: auto; bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    }
+    .item { padding: 16px 12px 12px; }
+  }
+</style>
+
+<script>
+  import { tick, setSound, isSoundOn, onSoundChange, reduceMotion } from '../scripts/sound.js';
+
+  const nav = document.querySelector('.snav');
+  const pill = nav.querySelector('.pill');
+  const dot = nav.querySelector('.jdot');
+  const items = [...nav.querySelectorAll('.item[data-id]')];
+  const soundBtn = nav.querySelector('.sound');
+
+  let current = items.find((i) => i.dataset.id === nav.dataset.current) || items[0];
+  let dotX = 0, anim = null;
+
+  const centre = (el) => el.offsetLeft + el.offsetWidth / 2 - 3;
+
+  function placePill(el) {
+    pill.style.width = el.offsetWidth + 'px';
+    pill.style.transform = `translateX(${el.offsetLeft}px)`;
+    pill.classList.add('on');
+  }
+  function setDot(x) { dotX = x; dot.style.transform = `translate(${x}px,0)`; dot.classList.add('on'); }
+
+  function hop(el) {
+    const x1 = centre(el);
+    if (x1 === dotX && !anim) return;
+    let x0 = dotX, y0 = 0;
+    if (anim) {
+      try { const m = new DOMMatrix(getComputedStyle(dot).transform); x0 = m.m41; y0 = m.m42; } catch {}
+      anim.cancel(); anim = null;
+    }
+    setDot(x1);
+    if (Math.abs(x1 - x0) < 1 || reduceMotion() || !dot.animate) return;
+    const h = -Math.min(36, 24 + Math.abs(x1 - x0) * 0.05); // jump height: stays below the top of the screen
+    const m = (x0 + x1) / 2;
+    anim = dot.animate([
+      { transform: `translate(${x0}px,${y0}px) scale(1,1)` },
+      { transform: `translate(${x0}px,1px) scale(1.3,.7)`, offset: 0.12, easing: 'cubic-bezier(.3,0,.5,1)' },
+      { transform: `translate(${m}px,${h}px) scale(.85,1.15)`, offset: 0.5, easing: 'cubic-bezier(.5,0,.7,1)' },
+      { transform: `translate(${x1}px,1px) scale(1.35,.65)`, offset: 0.84, easing: 'cubic-bezier(.22,1,.36,1)' },
+      { transform: `translate(${x1}px,0) scale(1,1)` },
+    ], { duration: 540 });
+    anim.onfinish = () => { anim = null; };
+  }
+
+  function setCurrent(el, { jump = true } = {}) {
+    if (!el) return;
+    current = el;
+    items.forEach((i) => i.classList.toggle('is-current', i === el));
+    placePill(el);
+    if (jump) hop(el); else setDot(centre(el));
+  }
+
+  // First paint: place without animation
+  pill.style.transition = 'none';
+  setCurrent(current, { jump: false });
+  requestAnimationFrame(() => requestAnimationFrame(() => (pill.style.transition = '')));
+  document.fonts?.ready.then(() => { pill.style.transition = 'none'; setCurrent(current, { jump: false }); requestAnimationFrame(() => (pill.style.transition = '')); });
+  addEventListener('resize', () => setCurrent(current, { jump: false }));
+
+  items.forEach((el) => {
+    el.addEventListener('mouseenter', () => { hop(el); tick(1500); });
+    el.addEventListener('focus', () => hop(el));
+    el.addEventListener('click', () => { setCurrent(el); tick(1700); });
+  });
+  nav.addEventListener('mouseleave', () => hop(current));
+
+  // The V logo: on the home page it glides back up to the hero instead of reloading
+  const homeLink = nav.querySelector('.item.home');
+  homeLink.addEventListener('click', (e) => {
+    if (nav.dataset.current !== 'home') return; // other pages: normal link to the home page
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' });
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    document.getElementById('main')?.focus({ preventScroll: true });
+  });
+
+  // Scroll-spy on the home page: the pill follows the section you're reading
+  if (nav.dataset.current === 'home') {
+    const map = { work: document.getElementById('work'), lab: document.getElementById('lab-notes') };
+    const visible = new Map();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => visible.set(e.target.id, e.isIntersecting));
+      const id = visible.get('lab-notes') ? 'lab' : visible.get('work') ? 'work' : 'home';
+      const el = items.find((i) => i.dataset.id === id);
+      if (el && el !== current) setCurrent(el);
+    }, { rootMargin: '-40% 0px -50% 0px' });
+    Object.values(map).forEach((s) => s && io.observe(s));
+  }
+
+  // Sound toggle
+  onSoundChange((on) => soundBtn.setAttribute('aria-pressed', String(on)));
+  soundBtn.addEventListener('click', () => setSound(!isSoundOn()));
+</script>

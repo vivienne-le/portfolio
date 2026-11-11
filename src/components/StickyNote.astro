@@ -1,0 +1,155 @@
+---
+// Contact note pinned to the top-right corner of every page.
+// Unfolds on hover (mouse), on tap (touch) and on keyboard focus.
+import { contact } from '../data/site.js';
+---
+<span class="wave-cursor" aria-hidden="true">👋</span>
+<div class="note" data-open="false">
+  <span class="drink" aria-hidden="true">
+    <span data-drink="coffee">☕</span>
+    <span data-drink="matcha">🍵</span>
+  </span>
+  <button class="note-tab" type="button" aria-expanded="false" aria-controls="note-links">Contact</button>
+  <div class="note-links" id="note-links">
+    <span class="note-h">Reach me at</span>
+    <a href={`mailto:${contact.email}`}>{contact.email} <span aria-hidden="true">↗</span></a>
+    <a href={contact.linkedin} target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+    {contact.github && <a href={contact.github} target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>}
+    <a href={contact.cv} target="_blank" rel="noopener">CV <span aria-hidden="true">↗</span></a>
+  </div>
+</div>
+
+<style>
+  .note {
+    position: fixed; z-index: 45;
+    top: calc(env(safe-area-inset-top, 0px) - 6px);
+    right: max(18px, env(safe-area-inset-right, 0px));
+    width: 96px; background: var(--note); color: var(--note-ink);
+    border-radius: 4px 4px 12px 12px; padding: 26px 13px 12px;
+    transform: rotate(4deg); transform-origin: top right;
+    box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.35);
+    transition: transform var(--d-object) var(--spring), width var(--d-object) var(--spring), padding var(--d-reveal) var(--ease-out);
+  }
+  .note:hover { transform: rotate(1deg) translateY(4px); }
+  .note[data-open="true"] { width: 240px; transform: rotate(0deg) translateY(14px); padding: 18px 16px 16px; }
+  /* Attention: grows and wiggles when someone types "contact" in the terminal */
+  .note.attention { animation: note-wiggle 1.4s var(--ease-out); }
+  @keyframes note-wiggle {
+    0%   { scale: 1;    rotate: 0deg; }
+    14%  { scale: 1.4;  rotate: -9deg; }
+    26%  { scale: 1.4;  rotate: 8deg; }
+    38%  { scale: 1.4;  rotate: -7deg; }
+    50%  { scale: 1.4;  rotate: 5deg; }
+    62%  { scale: 1.38; rotate: -3deg; }
+    74%  { scale: 1.36; rotate: 1deg; }
+    100% { scale: 1;    rotate: 0deg; }
+  }
+  /* Coffee / matcha sticker slapped onto the note by the terminal */
+  .drink {
+    position: absolute; left: -24px; bottom: -18px; width: 44px; height: 44px; z-index: 2;
+    display: grid; place-items: center; font-size: 30px; line-height: 1; pointer-events: none;
+    filter: drop-shadow(0 0 0 #fff) drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.2));
+    opacity: 0; transform: rotate(-14deg) scale(1.6);
+  }
+  .drink > * { display: none; grid-area: 1 / 1; }
+  .drink[data-kind="coffee"] [data-drink="coffee"], .drink[data-kind="matcha"] [data-drink="matcha"] { display: block; }
+  .drink.on { animation: slap 520ms var(--ease-out) forwards; }
+  @keyframes slap {
+    0%   { opacity: 0; transform: rotate(-30deg) scale(1.8); }
+    60%  { opacity: 1; transform: rotate(-10deg) scale(0.92); }
+    100% { opacity: 1; transform: rotate(-14deg) scale(1); }
+  }
+  /* Waving-hand cursor over the note (mouse only) */
+  .note.waving, .note.waving * { cursor: none !important; }
+  .note.waving .note-links a, .note.waving .note-links a * { cursor: pointer !important; } /* links keep the normal pointer */
+  .wave-cursor {
+    position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none;
+    font-size: 26px; line-height: 1; opacity: 0;
+    translate: var(--cx, -100px) var(--cy, -100px);
+    transition: opacity 120ms ease-out;
+  }
+  .wave-cursor.on { opacity: 1; }
+  .wave-cursor.on::selection { background: none; }
+  .wave-cursor.on { animation: wave 1.1s ease-in-out infinite; transform-origin: 70% 85%; }
+  @keyframes wave {
+    0%, 60%, 100% { rotate: 0deg; }
+    10% { rotate: 16deg; } 20% { rotate: -8deg; } 30% { rotate: 14deg; } 40% { rotate: -4deg; } 50% { rotate: 10deg; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wave-cursor.on { animation: none; } }
+  .note-tab {
+    all: unset; cursor: pointer; font: 500 0.85rem/1.2 var(--sans); display: block; width: 100%;
+  }
+  .note-tab:focus-visible { outline: 2px solid var(--note-ink); outline-offset: 4px; border-radius: 4px; }
+  .note-links {
+    display: grid; gap: 8px; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden;
+    transition: max-height var(--d-object) var(--ease-out), opacity var(--d-move) var(--ease-out), visibility 0s linear var(--d-move);
+  }
+  .note[data-open="true"] .note-links { max-height: 200px; opacity: 1; visibility: visible; margin-top: 12px; transition-delay: 0s; }
+  .note-h { font: 400 0.72rem/1 var(--mono); opacity: 0.7; }
+  .note-links a { color: var(--note-ink); text-decoration: none; font-size: 0.88rem; overflow-wrap: anywhere; }
+  .note-links a:hover { text-decoration: underline; }
+  @media (max-width: 640px) {
+    .note { width: 82px; padding: 22px 11px 10px; }
+    .note-tab { font-size: 0.8rem; }
+  }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  const note = document.querySelector('.note');
+  const tab = note.querySelector('.note-tab');
+  let t = null;
+  const isOpen = () => note.dataset.open === 'true';
+  function set(open) {
+    clearTimeout(t);
+    if (open === isOpen()) return;
+    note.dataset.open = String(open);
+    tab.setAttribute('aria-expanded', String(open));
+    tick(open ? 1800 : 1200);
+  }
+  note.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') set(true); });
+  note.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { clearTimeout(t); t = setTimeout(() => set(false), 200); } });
+  // On phones a tap focuses the button and then clicks it. Remember it was a tap,
+  // so focus doesn't open the note right before the click closes it again.
+  let tapped = false;
+  tab.addEventListener('pointerdown', (e) => { tapped = e.pointerType !== 'mouse'; });
+  note.addEventListener('focusin', () => { if (!tapped) set(true); });
+  note.addEventListener('focusout', (e) => { if (!note.contains(e.relatedTarget)) set(false); });
+  tab.addEventListener('click', (e) => {
+    if (tapped || e.detail === 0) set(!isOpen()); // tap, or Enter/Space on the keyboard
+    tapped = false;
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { set(false); tab.blur(); } });
+  document.addEventListener('pointerdown', (e) => { if (isOpen() && !note.contains(e.target)) set(false); });
+  // Typing "contact" in the footer terminal makes the note grow and wiggle
+  const drink = note.querySelector('.drink');
+  window.addEventListener('note:attention', (e) => {
+    const kind = e.detail?.sticker;
+    if (kind) {
+      drink.dataset.kind = kind;
+      drink.classList.remove('on');
+      void drink.offsetWidth;
+      drink.classList.add('on');
+    }
+    note.classList.remove('attention');
+    void note.offsetWidth; // restart the animation if it's already playing
+    note.classList.add('attention');
+    tick(2100);
+  });
+  note.addEventListener('animationend', () => note.classList.remove('attention'));
+
+  // Swap the mouse pointer for a waving hand while it's over the note.
+  // The emoji's fingertip sits on the real pointer position, so clicks still land where you aim.
+  const hand = document.querySelector('.wave-cursor');
+  const placeHand = (e) => { hand.style.setProperty('--cx', `${e.clientX - 9}px`); hand.style.setProperty('--cy', `${e.clientY - 4}px`); };
+  note.addEventListener('pointerenter', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    placeHand(e); note.classList.add('waving'); hand.classList.add('on');
+  });
+  note.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    placeHand(e);
+    hand.classList.toggle('on', !e.target.closest('a')); // over a link: back to the normal pointer
+  });
+  note.addEventListener('pointerleave', () => { note.classList.remove('waving'); hand.classList.remove('on'); });
+</script>

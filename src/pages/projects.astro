@@ -1,0 +1,256 @@
+---
+// Passion projects: "the nursery". Every project is a little icon with a name tag,
+// toddling around their playpen. Hover (or focus) stops one and wakes it up.
+// Edit the list in src/data/site.js → passionProjects.
+import Base from '../layouts/Base.astro';
+import { site, passionProjects } from '../data/site.js';
+
+const bg = { blush: 'var(--blush-soft)', lilac: 'var(--lilac)', butter: 'var(--butter)', mint: 'var(--mint)', sky: 'var(--sky)' };
+---
+<Base title={`Passion projects · ${site.name}`} description="The little things I make because I can't not make them." current="lab">
+  <article class="col nursery-page">
+    <a class="back label" href="/#lab-notes">← Play</a>
+    <h1 id="nursery">Passion projects, <span class="hand">my babies</span></h1>
+    <p class="intro">Nobody asked for these. I made them anyway, and I love every one of them a little too much.</p>
+
+    <ul class="nursery">
+      {passionProjects.map((p, i) => {
+        const isLink = p.href && p.href !== '#';
+        const external = isLink && /^https?:/.test(p.href);
+        const href = isLink && p.href.startsWith('/work/') && !p.href.includes('#') ? `${p.href}#case` : p.href;
+        const Tag = isLink ? 'a' : 'div';
+        return (
+          <li style={`--i:${i}`}>
+            <Tag class="baby" {...(isLink ? { href } : {})} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+              <span class="bubble" aria-hidden="true">{p.blurb}</span>
+              <span class="hearts" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></span>
+              {p.logo
+                ? <span class="tile has-logo"><img src={p.logo} alt="" width="76" height="76" loading="lazy" decoding="async" /></span>
+                : <span class="tile" style={`background:${bg[p.color] ?? 'var(--paper-2)'}`} aria-hidden="true">{p.emoji}</span>}
+              <span class="tag">
+                <b>{p.name}</b>
+                <small>{p.expected ? `expected birth ${p.expected}` : `born ${p.born}`}{external && <span aria-hidden="true"> ↗</span>}</small>
+              </span>
+              <span class="sr-only">{p.blurb}{external ? ' (opens in a new tab)' : ''}</span>
+            </Tag>
+          </li>
+        );
+      })}
+    </ul>
+  </article>
+</Base>
+
+<style>
+  .nursery-page { display: grid; --heart: #ec5f86; }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .nursery-page { --heart: #ff8fb0; } }
+  :global(:root[data-theme="dark"]) .nursery-page { --heart: #ff8fb0; }
+  .back { text-decoration: none; margin-bottom: 18px; width: fit-content; }
+  .back:hover { color: var(--ink); }
+  h1 { font-size: var(--text-l); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 12px; }
+  h1 .hand { color: var(--dot); }
+  .intro { color: var(--ink-2); max-width: 30rem; margin-bottom: 8px; }
+
+  .nursery {
+    list-style: none; margin: 0; padding: 64px 0 24px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 56px 16px;
+  }
+  .baby {
+    position: relative; display: grid; justify-items: center; gap: 12px;
+    text-decoration: none; color: inherit; -webkit-tap-highlight-color: transparent;
+  }
+  a.baby { cursor: pointer; }
+
+  /* The icon, asleep: breathes slowly, each one on its own rhythm */
+  .tile {
+    width: 76px; height: 76px; border-radius: 22px; display: grid; place-items: center;
+    font-size: 36px; line-height: 1;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06), 0 6px 14px -6px rgba(0, 0, 0, 0.25);
+    animation: breathe 3.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.7s);
+    transition: rotate var(--d-object) var(--spring), translate var(--d-object) var(--spring);
+  }
+  .has-logo { overflow: hidden; background: var(--paper); }
+  .has-logo img { width: 100%; height: 100%; object-fit: cover; }
+  @keyframes breathe { 0%, 100% { scale: 1; } 50% { scale: 1.04 0.97; } }
+
+  /* Name tag in the same frosted-glass pill style as the nav bar */
+  .tag {
+    display: grid; justify-items: center; gap: 2px; text-align: center; max-width: 100%;
+    padding: 7px 14px 8px; border-radius: 999px;
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .tag b { font: 500 0.78rem/1.25 var(--sans); }
+  .tag small { font: 400 0.66rem/1 var(--mono); color: var(--ink-2); }
+
+  /* Awake: hops up, a heart floats out, and a speech bubble says what it is */
+  /* Speech bubble in frosted glass, like the nav bar, so the floating hearts show through it */
+  .bubble {
+    position: absolute; bottom: calc(100% + 10px); left: 50%; translate: -50% 6px; z-index: 3;
+    width: max-content; max-width: 180px; padding: 7px 11px; border-radius: 12px;
+    font: 500 0.74rem/1.3 var(--sans); color: var(--ink); text-align: center;
+    background: color-mix(in srgb, var(--paper) 40%, transparent);
+    -webkit-backdrop-filter: blur(10px) saturate(1.4); backdrop-filter: blur(10px) saturate(1.4);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--d-move) var(--ease-out), translate var(--d-move) var(--spring);
+  }
+  .bubble::after {   /* little glass tail */
+    content: ""; position: absolute; top: calc(100% - 5px); left: 50%; width: 9px; height: 9px;
+    translate: -50% 0; rotate: 45deg; border-radius: 0 0 2px 0;
+    background: inherit; -webkit-backdrop-filter: inherit; backdrop-filter: inherit;
+    border: 1px solid var(--line); border-top: 0; border-left: 0;
+  }
+  /* Three little hearts float up past the bubble, one after another */
+  .hearts { position: absolute; top: -2px; right: calc(50% - 50px); z-index: 4; pointer-events: none; }
+  .hearts i {
+    position: absolute; right: 0; top: 0; font-style: normal; font-size: 17px; line-height: 1;
+    color: var(--heart); opacity: 0; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+  }
+  .hearts i:nth-child(2) { right: 14px; font-size: 13px; }
+  .hearts i:nth-child(3) { right: -8px; font-size: 11px; }
+  @media (hover: hover) {
+    .baby:hover .tile { animation-play-state: paused; translate: 0 -8px; rotate: -6deg; }
+    .baby:hover .bubble { opacity: 1; translate: -50% 0; }
+    .baby:hover .hearts i { animation: heart 1500ms var(--ease-out) forwards; }
+    .baby:hover .hearts i:nth-child(2) { animation-delay: 180ms; }
+    .baby:hover .hearts i:nth-child(3) { animation-delay: 360ms; }
+  }
+  .baby:focus-visible .tile { translate: 0 -8px; rotate: -6deg; }
+  .baby:focus-visible .bubble { opacity: 1; translate: -50% 0; }
+  .baby:active .tile { scale: 0.94; }
+  @keyframes heart {
+    0% { opacity: 0; translate: 0 8px; scale: 0.5; }
+    15% { opacity: 1; scale: 1.15; }
+    70% { opacity: 1; }
+    100% { opacity: 0; translate: 8px -40px; scale: 0.9; }
+  }
+
+  /* Playpen: with JavaScript on, the babies toddle around inside this box.
+     Without it (or with reduced motion), they simply sit in the grid above. */
+  .nursery.roaming {
+    display: block; position: relative; height: var(--pen-h, 480px); padding: 0; margin-top: 64px;
+    border-radius: 28px; border: 1px solid var(--line);
+    isolation: isolate;   /* keeps the babies' stacking inside the pen, under the nav */
+  }
+  .roaming li { position: absolute; left: 0; top: 0; will-change: transform; }
+  .roaming li.hovered, .roaming li:focus-within { z-index: 999 !important; }
+  /* While walking: a little side-to-side waddle instead of breathing */
+  .roaming li.walking .tile { animation: waddle 0.5s ease-in-out infinite; }
+  .roaming li.walking .tag { animation: tag-bob 0.5s ease-in-out infinite; }
+  @keyframes waddle {
+    0%, 100% { rotate: -5deg; translate: 0 0; }
+    25% { translate: 0 -3px; }
+    50% { rotate: 5deg; translate: 0 0; }
+    75% { translate: 0 -3px; }
+  }
+  @keyframes tag-bob { 0%, 50%, 100% { translate: 0 0; } 25%, 75% { translate: 0 -1px; } }
+
+  @media (max-width: 520px) {
+    .nursery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 10px; padding-top: 40px; }
+    .tile { width: 64px; height: 64px; border-radius: 19px; font-size: 30px; }
+    .tag { padding: 6px 11px 7px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile { animation: none; }
+    .baby:hover .hearts i { animation: none; }
+  }
+</style>
+
+<script>
+  import { tick, reduceMotion } from '../scripts/sound.js';
+  document.querySelectorAll('.baby').forEach((b, i) => b.addEventListener('mouseenter', () => tick(1300 + i * 110)));
+
+  // ── Toddling: each baby walks to a random spot in the playpen, rests a while, then wanders on.
+  //    Hovering or focusing one makes it stop and say hi. Turned off for reduced motion.
+  const pen = document.querySelector('.nursery');
+  if (pen && !reduceMotion()) {
+    const items = [...pen.querySelectorAll('li')];
+    pen.classList.add('roaming');
+    const penH = () => (innerWidth <= 520 ? 700 : 500);
+    pen.style.setProperty('--pen-h', penH() + 'px');
+
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const PAD = 10;
+    let W = pen.clientWidth, H = pen.clientHeight;
+    const babies = items.map((el) => ({ el, x: 0, y: 0, tx: 0, ty: 0, w: el.offsetWidth, h: el.offsetHeight,
+      speed: rand(18, 30), rest: rand(300, 2200), walking: false, held: false }));
+    const maxX = (b) => Math.max(PAD, W - b.w - PAD);
+    const maxY = (b) => Math.max(PAD, H - b.h - PAD);
+
+    // Start in a loose, slightly jumbled grid so nobody overlaps
+    const cols = Math.max(1, Math.floor(W / 150)), rows = Math.ceil(babies.length / cols);
+    babies.forEach((b, i) => {
+      const c = i % cols, r = Math.floor(i / cols);
+      b.x = Math.min(maxX(b), (c + 0.5) * (W / cols) - b.w / 2 + rand(-12, 12));
+      b.y = Math.min(maxY(b), (r + 0.5) * (H / rows) - b.h / 2 + rand(-12, 12));
+      b.tx = b.x; b.ty = b.y;
+    });
+
+    // Pick a new spot, preferring ones away from the other babies
+    const pickTarget = (b) => {
+      let best = null, bestD = -1;
+      for (let k = 0; k < 8; k++) {
+        const x = rand(PAD, maxX(b)), y = rand(PAD, maxY(b));
+        const d = Math.min(...babies.filter((o) => o !== b).map((o) => Math.hypot((o.tx - x) / o.w, (o.ty - y) / o.h)));
+        if (d > bestD) { bestD = d; best = { x, y }; }
+      }
+      b.tx = best.x; b.ty = best.y; b.speed = rand(18, 30);
+    };
+
+    const place = (b) => {
+      b.el.style.transform = `translate(${b.x.toFixed(1)}px, ${b.y.toFixed(1)}px)`;
+      b.el.style.zIndex = String(Math.round(b.y));   // lower on screen = in front
+      b.el.classList.toggle('walking', b.walking && !b.held);
+    };
+
+    babies.forEach((b) => {
+      const hold = (on) => { b.held = on; b.el.classList.toggle('hovered', on); place(b); };
+      b.el.addEventListener('mouseenter', () => hold(true));
+      b.el.addEventListener('mouseleave', () => hold(false));
+      b.el.addEventListener('focusin', () => hold(true));
+      b.el.addEventListener('focusout', () => hold(false));
+      place(b);
+    });
+
+    let last = performance.now();
+    const step = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      for (const b of babies) {
+        if (b.held) continue;
+        if (!b.walking) {
+          b.rest -= dt * 1000;
+          if (b.rest <= 0) { pickTarget(b); b.walking = true; }
+        } else {
+          const dx = b.tx - b.x, dy = b.ty - b.y, dist = Math.hypot(dx, dy);
+          if (dist < 1.5) { b.walking = false; b.rest = rand(1200, 4500); }
+          else { const v = Math.min(dist, b.speed * dt); b.x += (dx / dist) * v; b.y += (dy / dist) * v; }
+        }
+      }
+      // Personal space: if two babies (icon + name tag) overlap, gently push them apart
+      const GAP = 8;
+      for (let i = 0; i < babies.length; i++) for (let j = i + 1; j < babies.length; j++) {
+        const a = babies[i], c = babies[j];
+        const ox = Math.min(a.x + a.w, c.x + c.w) - Math.max(a.x, c.x) + GAP;
+        const oy = Math.min(a.y + a.h, c.y + c.h) - Math.max(a.y, c.y) + GAP;
+        if (ox > 0 && oy > 0) {
+          const k = (a.held || c.held) ? 0.2 : 0.1;
+          if (ox < oy) { const dir = (c.x + c.w / 2) >= (a.x + a.w / 2) ? 1 : -1; const m = ox * k;
+            if (!a.held) a.x -= dir * m; if (!c.held) c.x += dir * m; }
+          else { const dir = (c.y + c.h / 2) >= (a.y + a.h / 2) ? 1 : -1; const m = oy * k;
+            if (!a.held) a.y -= dir * m; if (!c.held) c.y += dir * m; }
+        }
+      }
+      for (const b of babies) { b.x = Math.min(maxX(b), Math.max(PAD, b.x)); b.y = Math.min(maxY(b), Math.max(PAD, b.y)); place(b); }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+
+    addEventListener('resize', () => {
+      pen.style.setProperty('--pen-h', penH() + 'px');
+      W = pen.clientWidth; H = pen.clientHeight;
+      babies.forEach((b) => { b.w = b.el.offsetWidth; b.h = b.el.offsetHeight; b.tx = Math.min(b.tx, maxX(b)); b.ty = Math.min(b.ty, maxY(b)); });
+    });
+  }
+</script>

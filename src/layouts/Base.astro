@@ -1,0 +1,86 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import StickyNote from '../components/StickyNote.astro';
+import Footer from '../components/Footer.astro';
+import EmojiCursor from '../components/EmojiCursor.astro';
+import { site, contact, tools } from '../data/site.js';
+
+const { title = site.title, description = site.description, current = 'home' } = Astro.props;
+const siteUrl = Astro.site ?? new URL('http://localhost:4321'); // set in astro.config.mjs
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const home = new URL('/', siteUrl).href;
+
+// "Who I am" in a format search engines and AI tools read directly (schema.org JSON-LD)
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': `${home}#me`,
+  name: site.name,
+  url: home,
+  image: new URL(site.photo, siteUrl).href,
+  jobTitle: 'UX Designer & Design Engineer',
+  description: site.description,
+  email: `mailto:${contact.email}`,
+  sameAs: [contact.linkedin, contact.github].filter(Boolean),
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'The Hague University of Applied Sciences' },
+  worksFor: { '@type': 'Organization', name: 'Decathlon Netherlands' },
+  homeLocation: [{ '@type': 'Country', name: 'Netherlands' }, { '@type': 'Country', name: 'Germany' }],
+  knowsAbout: ['UX design', 'Human-computer interaction', 'Design engineering', 'Prototyping', 'User research', 'Search and SEO', 'Content for large language models', 'Data science', ...tools.map((t) => t.name)],
+};
+const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: site.title, url: home, author: { '@id': `${home}#me` } };
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL(site.photo, siteUrl).href} />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="alternate" type="text/plain" title="About Vivienne, for AI readers" href="/llms.txt" />
+    <script type="application/ld+json" set:html={JSON.stringify([person, website])} />
+    <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#131015" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/logos/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Caveat+Brush&display=swap" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav current={current} />
+    <StickyNote />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <EmojiCursor />
+    {current !== 'home' && (
+      <script is:inline>
+        // Inner pages always open at the top (unless the link points to a #section)
+        try { history.scrollRestoration = 'manual'; } catch (e) {}
+        // Links like /about#about-me land on that heading, others at the very top,
+        // even if the browser tries to restore an old scroll position afterwards
+        const land = () => {
+          const t = location.hash && document.getElementById(location.hash.slice(1));
+          if (t) t.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
+        };
+        land();
+        addEventListener('DOMContentLoaded', land);
+        addEventListener('load', land);
+        addEventListener('pageshow', land);
+      </script>
+    )}
+    <style>
+      .skip { position: absolute; left: -999px; top: 8px; z-index: 60; background: var(--ink); color: var(--paper); padding: 8px 12px; border-radius: 8px; }
+      .skip:focus { left: 12px; }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+---
+// A simple toggle list (accordion). Uses native <details>, so it works with
+// mouse, touch, keyboard and screen readers, and several items can be open at once.
+const { items = [] } = Astro.props;
+---
+<div class="toggles">
+  {items.map((it) => (
+    <details class="toggle">
+      <summary>
+        <span class="t">{it.title}</span>
+        <span class="plus" aria-hidden="true"></span>
+      </summary>
+      <div class="body" set:html={it.body} />
+    </details>
+  ))}
+</div>
+
+<style>
+  .toggles { border-top: 1px solid var(--line); }
+  .toggle { border-bottom: 1px solid var(--line); interpolate-size: allow-keywords; }
+  summary {
+    list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 14px 2px; font-weight: 500; font-size: 0.95rem; color: var(--ink);
+    -webkit-tap-highlight-color: transparent; border-radius: 6px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .plus { position: relative; flex: none; width: 11px; height: 11px; }
+  .plus::before, .plus::after {
+    content: ""; position: absolute; inset: 4.75px 0 auto; height: 1.5px; border-radius: 1px; background: var(--ink-3);
+    transition: transform var(--d-move) var(--spring), background var(--d-colour);
+  }
+  .plus::after { transform: rotate(90deg); }
+  summary:hover .plus::before, summary:hover .plus::after { background: var(--ink); }
+  .toggle[open] .plus::after { transform: rotate(0deg); }
+  .toggle[open] .plus::before, .toggle[open] .plus::after { background: var(--dot); }
+  .body { padding: 0 2px 16px; color: var(--ink-2); font-size: 0.92rem; }
+  .body :global(p) { margin: 0 0 10px; }
+
+  /* Smooth open/close where the browser supports it (others just open instantly) */
+  .toggle::details-content {
+    block-size: 0; overflow: hidden; opacity: 0;
+    transition: block-size var(--d-reveal) var(--ease-out), opacity var(--d-move) var(--ease-out), content-visibility var(--d-reveal) allow-discrete;
+  }
+  .toggle[open]::details-content { block-size: auto; opacity: 1; }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  document.querySelectorAll('.toggle').forEach((d) => d.addEventListener('toggle', () => tick(d.open ? 1500 : 1100)));
+</script>

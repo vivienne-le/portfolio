@@ -1,0 +1,54 @@
+---
+// Toolbox: the software you use, as a grid of small tiles.
+// Each tile shows the tool's logo (if you add one) or a lettered placeholder.
+import { tools } from '../data/site.js';
+const tints = ['sky', 'lilac', 'mint', 'butter', 'blush', 'navy'];
+const initials = (n) => n.split(/\s+/).map((w) => w[0]).join('').slice(0, 2);
+---
+<ul class="tools">
+  {tools.map((t, i) => (
+    <li class="tool">
+      <span class={`mark ${t.logo ? `has-logo${t.fill ? ' fill' : ''}` : `tint-${tints[i % tints.length]}`}`} aria-hidden="true">
+        {t.logo ? <img src={t.logo} alt="" loading="lazy" decoding="async" /> : (t.short ?? initials(t.name))}
+      </span>
+      <span class="name">{t.name}</span>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .tools {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); gap: 10px;
+  }
+  .tool {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-width: 0;
+    border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--paper);
+    transition: transform var(--d-object) var(--spring), box-shadow var(--d-move) var(--ease-out), border-color var(--d-colour);
+  }
+  .tool:hover { transform: translateY(-3px) rotate(-1deg); box-shadow: var(--shadow); border-color: transparent; }
+  .tool:hover .mark { transform: rotate(-8deg) scale(1.08); }
+  .mark {
+    flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
+    font: 500 0.78rem/1 var(--mono); letter-spacing: 0.02em;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    transition: transform var(--d-object) var(--spring);
+  }
+  .has-logo { background: #fff; padding: 4px; overflow: hidden; }
+  .has-logo img { width: 100%; height: 100%; object-fit: contain; }
+  /* App-style icons fill the tile edge to edge; the slight zoom tucks their own rounded corners out of sight */
+  .has-logo.fill { padding: 0; background: none; }
+  .has-logo.fill img { object-fit: cover; transform: scale(1.12); }
+  .tint-sky { background: var(--sky); color: var(--sky-ink); }
+  .tint-lilac { background: var(--lilac); color: var(--lilac-ink); }
+  .tint-mint { background: var(--mint); color: var(--mint-ink); }
+  .tint-butter { background: var(--butter); color: var(--butter-ink); }
+  .tint-blush { background: var(--blush-soft); color: var(--blush-ink); }
+  .tint-navy { background: var(--navy); color: var(--on-navy); }
+  .name { min-width: 0; font-weight: 500; font-size: 0.9rem; line-height: 1.3; }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  document.querySelectorAll('.tool').forEach((t, i) => t.addEventListener('mouseenter', () => tick(1250 + (i % 6) * 90)));
+</script>

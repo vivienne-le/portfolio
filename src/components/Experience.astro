@@ -1,0 +1,183 @@
+---
+// Experience, education and certificates.
+// Rows with `points` unfold on hover (mouse), on tap (touch) and on keyboard focus,
+// and the other rows dim so the open one stands out.
+import { experience, education, certificates } from '../data/site.js';
+const groups = [
+  { title: 'Experience', rows: experience },
+  { title: 'Education', rows: education },
+  { title: 'Certificates', rows: certificates.map((c) => ({ org: c.name, role: c.by, when: c.when, cert: true, image: c.image, verify: c.verify })) },
+];
+---
+<div class="exp">
+  {groups.map((g, gi) => (
+    <div class="group">
+      <h3 class="group-title">{g.title}</h3>
+      <ul class="rows">
+        {g.rows.map((r, ri) => {
+          const has = r.points?.length > 0;
+          const id = `exp-${gi}-${ri}`;
+          return (
+            <li class={has ? 'row has' : r.cert ? 'row cert' : 'row'} {...(has || r.cert ? { tabindex: 0, 'aria-expanded': 'false', 'aria-controls': id } : {})} {...(r.cursor ? { 'data-cursor': r.cursor } : {})} {...(r.cursorDark ? { 'data-cursor-dark': r.cursorDark } : {})}>
+              {r.cert && r.verify
+                ? <a class="org verify" href={r.verify} target="_blank" rel="noopener">{r.org}<span class="arrow" aria-hidden="true"> ↗</span><span class="sr-only"> (verify certificate, opens in a new tab)</span></a>
+                : <span class="org">{r.org}</span>}
+              <span class="role">{r.role}</span>
+              <span class="when">{r.when}{has && <span class="plus" aria-hidden="true"></span>}</span>
+              {r.cert && (
+                <span class="cert-pop" id={id}>
+                  <span class="cert-paper">
+                    {r.image
+                      ? <img src={r.image} alt={`Certificate: ${r.org}`} loading="lazy" decoding="async" />
+                      : <span class="cert-ph" aria-hidden="true">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg>
+                          <span>certificate</span>
+                        </span>}
+                  </span>
+                </span>
+              )}
+              {has && (
+                <div class="more" id={id}>
+                  <ul class="points">
+                    {r.points.map((p) => <li>{p}</li>)}
+                  </ul>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  ))}
+</div>
+
+<style>
+  .exp { display: grid; gap: 48px; }
+  /* same style as the other section titles, e.g. "What I can help with" */
+  .group-title { font-size: var(--text-m); font-weight: 500; color: var(--ink); margin-bottom: 14px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .row {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) 8.5rem; gap: 4px 16px; align-items: baseline;
+    padding: 11px 0; border-top: 1px solid var(--line); font-size: 0.9rem;
+    transition: opacity var(--d-move) var(--ease-out);
+  }
+  .row:last-child { border-bottom: 1px solid var(--line); }
+  .has { cursor: pointer; outline-offset: 4px; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .org { font-weight: 500; }
+  .role { color: var(--ink-2); }
+  .when { font: 400 0.78rem/1.4 var(--mono); color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 10px; justify-self: end; }
+
+  /* the small + that turns into − when open */
+  .plus { position: relative; width: 9px; height: 9px; }
+  .plus::before, .plus::after { content: ""; position: absolute; inset: 4px 0 auto; height: 1.5px; border-radius: 1px; background: var(--ink-3); transition: transform var(--d-move) var(--ease-out), background var(--d-colour); }
+  .plus::after { transform: rotate(90deg); }
+
+  /* unfolding bullet list */
+  .more {
+    grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; opacity: 0;
+    transition: grid-template-rows var(--d-reveal) var(--ease-out), opacity var(--d-move) var(--ease-out);
+  }
+  .points { overflow: hidden; min-height: 0; display: grid; gap: 4px; padding-left: 0; }
+  .points li { position: relative; padding-left: 16px; color: var(--ink-2); font-size: 0.86rem; line-height: 1.5; }
+  .points li:first-child { margin-top: 8px; }
+  .points li:last-child { margin-bottom: 4px; }
+  .points li::before { content: ""; position: absolute; left: 2px; top: 0.6em; width: 5px; height: 5px; border-radius: 50%; background: var(--blush); }
+
+  .row.open .more { grid-template-rows: 1fr; opacity: 1; }
+  .row.open .plus::after { transform: rotate(0deg); }
+  .row.open .plus::before, .row.open .plus::after { background: var(--dot); }
+
+  @media (hover: hover) {
+    .has:not(.just-closed):hover .more { grid-template-rows: 1fr; opacity: 1; }
+    .has:not(.just-closed):hover .plus::after { transform: rotate(0deg); }
+    .has:not(.just-closed):hover .plus::before, .has:not(.just-closed):hover .plus::after { background: var(--dot); }
+    .rows:has(.has:hover) .row:not(:hover), .rows:has(.cert:hover) .row:not(:hover) { opacity: 0.4; }
+  }
+
+  /* Certificate preview: pops up beside the row on wide screens (never over the name) */
+  .cert { cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; }
+  .cert-pop { pointer-events: none; }
+  /* Verify link: the certificate name opens its verify page. With a mouse the whole row is clickable. */
+  .verify { color: inherit; text-decoration: none; }
+  .verify .arrow { color: var(--ink-3); transition: color var(--d-colour); }
+  .cert:hover .verify .arrow, .verify:focus-visible .arrow { color: var(--dot); }
+  @media (hover: hover) {
+    .verify::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+  }
+  .cert-paper {
+    display: block; width: 200px; aspect-ratio: 1.414; padding: 6px; background: var(--paper);
+    border-radius: 4px; box-shadow: var(--shadow), 0 0 0 1px var(--line);
+  }
+  .cert-paper img, .cert-ph { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; display: block; }
+  .cert-ph {
+    display: grid; place-content: center; justify-items: center; gap: 6px; color: var(--ink-3);
+    background: repeating-linear-gradient(135deg, var(--paper-2) 0 7px, transparent 7px 14px);
+    font: 400 0.62rem/1 var(--mono); letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  @media (min-width: 1100px) {
+    .cert-pop {
+      position: absolute; left: calc(100% + 28px); top: 50%; z-index: 5;
+      opacity: 0; transform: translate(-12px, -50%) rotate(-4deg) scale(0.88);
+      transition: opacity var(--d-move) var(--ease-out), transform var(--d-object) var(--spring);
+    }
+    .cert:hover .cert-pop, .cert:focus-visible .cert-pop, .cert.open .cert-pop { opacity: 1; transform: translate(0, -50%) rotate(3deg) scale(1); }
+  }
+  /* Narrower screens: no room beside the list, so the picture unfolds below the name */
+  @media (max-width: 1099px) {
+    .cert-pop {
+      grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; opacity: 0;
+      transition: grid-template-rows var(--d-reveal) var(--ease-out), opacity var(--d-move) var(--ease-out);
+    }
+    .cert-pop > .cert-paper { overflow: hidden; min-height: 0; margin: 0; width: min(240px, 100%); }
+    .cert.open .cert-pop, .cert:focus-visible .cert-pop { grid-template-rows: 1fr; opacity: 1; }
+    .cert.open .cert-pop > .cert-paper, .cert:focus-visible .cert-pop > .cert-paper { margin: 10px 0 4px; }
+  }
+  @media (max-width: 1099px) and (hover: hover) {
+    .cert:hover .cert-pop { grid-template-rows: 1fr; opacity: 1; }
+    .cert:hover .cert-pop > .cert-paper { margin: 10px 0 4px; }
+  }
+
+  @media (max-width: 560px) {
+    .row { grid-template-columns: minmax(0, 1fr) 8rem; }
+    .role { grid-column: 1 / -1; grid-row: 2; }
+  }
+</style>
+
+<script>
+  import { tick } from '../scripts/sound.js';
+  // Click or tap a row to open it; it stays open until it is clicked again.
+  // Any number of rows can be open at the same time.
+  // Hovering a closed row (mouse) shows a quick preview.
+  const rows = [...document.querySelectorAll('.exp .has')];
+  rows.forEach((row) => {
+    const toggle = () => {
+      const open = !row.classList.contains('open');
+      row.classList.toggle('open', open);
+      row.classList.toggle('just-closed', !open);
+      row.setAttribute('aria-expanded', String(open));
+      tick(open ? 1500 : 1100);
+    };
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('a')) return;
+      toggle();
+    });
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+    // After closing with the mouse, don't let the hover preview reopen it until the pointer leaves
+    row.addEventListener('mouseleave', () => row.classList.remove('just-closed'));
+  });
+
+  // Certificates: tap (touch) or Enter toggles the picture; mouse users just hover
+  document.querySelectorAll('.exp .cert').forEach((row) => {
+    const toggle = () => {
+      const open = !row.classList.contains('open');
+      row.classList.toggle('open', open);
+      row.setAttribute('aria-expanded', String(open));
+      tick(open ? 1500 : 1100);
+    };
+    row.addEventListener('pointerup', (e) => { if (e.pointerType !== 'mouse') toggle(); });
+    row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    row.addEventListener('mouseenter', () => tick(1300));
+  });
+</script>

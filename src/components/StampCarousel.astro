@@ -1,0 +1,120 @@
+---
+// A small stack of photo stamps. The front stamp is tossed to the back to reveal the next one.
+// Controls: arrow buttons, swipe (touch), drag (mouse), arrow keys when focused, or click the front stamp.
+import Stamp from './Stamp.astro';
+const { photos = [], label = 'Photos' } = Astro.props;
+---
+<div class="deck" data-deck role="region" aria-roledescription="carousel" aria-label={label}>
+  <ul class="cards" tabindex="0">
+    {photos.map((p, i) => (
+      <li class="card" data-k={i} aria-roledescription="slide" aria-label={`${i + 1} of ${photos.length}`}>
+        <Stamp src={p.src} alt={p.alt} label={p.label ?? `photo ${i + 1}`} />
+      </li>
+    ))}
+  </ul>
+  <div class="controls">
+    <button class="nav-btn prev" type="button" aria-label="Previous photo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="count label" aria-live="polite"><span class="n">1</span> / {photos.length}</span>
+    <button class="nav-btn next" type="button" aria-label="Next photo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .deck { --w: clamp(180px, 46vw, 220px); --h: calc(var(--w) * 1.22); display: grid; gap: 14px; justify-items: start; }
+  .cards {
+    list-style: none; margin: 0; padding: 0; position: relative;
+    width: calc(var(--w) + 40px); height: calc(var(--h) + 24px);
+    touch-action: pan-y; cursor: grab; border-radius: 8px;
+  }
+  .cards:active { cursor: grabbing; }
+  .card {
+    position: absolute; left: 0; top: 12px; width: var(--w); height: var(--h);
+    /* --k: 0 = front, 1, 2… further back */
+    z-index: calc(10 - var(--k));
+    transform:
+      translate(calc(var(--k) * 12px), calc(var(--k) * -6px))
+      rotate(calc(-3deg + var(--k) * 4deg))
+      scale(calc(1 - var(--k) * 0.04));
+    opacity: clamp(0, calc(3 - var(--k)), 1);
+    transition: transform var(--d-object) var(--spring), opacity var(--d-move) var(--ease-out);
+  }
+  .card :global(.stamp-wrap) { width: 100%; height: 100%; }
+  .controls { display: flex; align-items: center; gap: 10px; }
+  .nav-btn {
+    display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+    background: var(--paper); border: 1px solid var(--line); color: var(--ink-2); cursor: pointer;
+    transition: color var(--d-colour), transform var(--d-move) var(--spring);
+  }
+  .nav-btn:hover { color: var(--ink); }
+  .nav-btn:active { transform: scale(0.9); }
+  .count { font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: center; }
+</style>
+
+<script>
+  import { tick, reduceMotion } from '../scripts/sound.js';
+
+  document.querySelectorAll('[data-deck]').forEach((deck) => {
+    const list = deck.querySelector('.cards');
+    const cards = [...deck.querySelectorAll('.card')];
+    const n = cards.length;
+    const counter = deck.querySelector('.n');
+    let order = cards.map((_, i) => i); // order[0] is the front card
+    let busy = false;
+
+    function render() {
+      order.forEach((ci, k) => {
+        cards[ci].style.setProperty('--k', String(k));
+        cards[ci].setAttribute('aria-hidden', k === 0 ? 'false' : 'true');
+      });
+      counter.textContent = String(order[0] + 1);
+    }
+
+    async function next() {
+      if (busy || n < 2) return;
+      busy = true;
+      const front = cards[order[0]];
+      if (!reduceMotion() && front.animate) {
+        // toss the front stamp to the right, then slide it in at the back
+        await front.animate(
+          [{ transform: getComputedStyle(front).transform }, { transform: 'translate(70%, -8%) rotate(14deg) scale(0.96)' }],
+          { duration: 220, easing: 'cubic-bezier(.3,0,.6,1)' }
+        ).finished;
+      }
+      order.push(order.shift());
+      render();
+      tick(1600);
+      setTimeout(() => (busy = false), 120);
+    }
+
+    function prev() {
+      if (busy || n < 2) return;
+      order.unshift(order.pop());
+      render();
+      tick(1300);
+    }
+
+    deck.querySelector('.next').addEventListener('click', next);
+    deck.querySelector('.prev').addEventListener('click', prev);
+    list.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    });
+
+    // Swipe or drag sideways; a plain click/tap on the stack shows the next photo
+    let sx = 0, sy = 0, down = false;
+    list.addEventListener('pointerdown', (e) => { down = true; sx = e.clientX; sy = e.clientY; });
+    list.addEventListener('pointerup', (e) => {
+      if (!down) return; down = false;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) (dx < 0 ? next : prev)();
+      else if (Math.abs(dx) < 6 && Math.abs(dy) < 6) next();
+    });
+    list.addEventListener('pointercancel', () => (down = false));
+
+    render();
+  });
+</script>

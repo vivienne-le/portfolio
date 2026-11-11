@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.env
+
+# Big original photos and design files that the site does not use (kept on this computer only)
+originals/
+about-me-images/
