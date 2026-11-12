@@ -1,6 +1,6 @@
 ---
 // Finder-style photo folders (About page).
-// Semi-transparent glass folders with emoji stickers. Hover: the photos inside peek out.
+// Frosted folders with emoji stickers. Hover: the photos inside peek out.
 // Click: the photos are laid out on the page below. Hover a photo: it grows a little.
 // Edit the folders and photos in src/data/site.js → aboutAlbums.
 import { aboutAlbums } from '../data/site.js';
@@ -122,11 +122,7 @@ const tilts = [-7, 4, -3, 6, -5, 3, -6, 5];
   .album:hover .s2 { transform: rotate(14deg) scale(1.08); }
 
   .name { font: 500 0.88rem/1.2 var(--sans); color: var(--ink); margin-top: 4px; text-align: center; }
-  .count {
-    font: 400 0.68rem/1 var(--mono); color: var(--ink-2);
-    padding: 4px 8px; border-radius: 999px; background: var(--paper-2);
-  }
-  .album.active .count { background: var(--navy-soft); color: var(--ink); }
+  .count { font-size: 0.78rem; line-height: 1; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 
   /* The photos, laid out on the page */
   .view { margin-top: 18px; }

@@ -2,12 +2,11 @@
 import Base from '../layouts/Base.astro';
 import Currently from '../components/Currently.astro';
 import ProjectList from '../components/ProjectList.astro';
-import Marquee from '../components/Marquee.astro';
 import Folder from '../components/Folder.astro';
 import Experience from '../components/Experience.astro';
 import Collage from '../components/Collage.astro';
 import Toolbox from '../components/Toolbox.astro';
-import { site, intro, playground } from '../data/site.js';
+import { site, intro, playground, contact } from '../data/site.js';
 ---
 <Base current="home">
   <section class="col hero">
@@ -19,10 +18,23 @@ import { site, intro, playground } from '../data/site.js';
         ? <img class="logo photo" src={site.photo} alt={`Photo of ${site.name}`} width="56" height="56" tabindex="0" />
         : <div class="logo logo-ph" aria-hidden="true"><span>photo</span></div>}
     </div>
-    <p class="hello label"><span lang="ja">こんにちは</span>, <span lang="de">hallo</span>, <span lang="vi">xin chào</span>, hello</p>
-    <p class="role"><span class="sakura role-flower" aria-hidden="true"></span>{site.role}</p>
-    <h1>I build things with code, then study how they <span class="hand">feel.</span></h1>
-    {intro.map((p) => <p class="lead" set:html={p} />)}
+    <p class="role">{site.role}</p>
+    <h1>I build things with code, then study how they feel.</h1>
+    {intro.map((p) => <p class="lead">{p}</p>)}
+    <div class="cta">
+      <a class="btn" href={`mailto:${contact.email}`}>Email me</a>
+      <button class="copy-mail" type="button" data-email={contact.email}>
+        <span class="copy-label">Copy address</span>
+        <span class="copied-label" aria-hidden="true">Copied</span>
+      </button>
+      <a class="cv-link" href={contact.cv} target="_blank" rel="noopener">CV (PDF)</a>
+      <span class="sr-only" aria-live="polite" data-copy-status></span>
+    </div>
+  </section>
+
+  <section class="col section" id="work" aria-labelledby="work-h">
+    <h2 class="section-title" id="work-h">Selected work</h2>
+    <ProjectList />
   </section>
 
   <section class="col section" aria-labelledby="now-h">
@@ -30,27 +42,17 @@ import { site, intro, playground } from '../data/site.js';
     <Currently />
   </section>
 
-  <section class="section skills" aria-labelledby="skills-h">
-    <div class="col"><h2 class="section-title" id="skills-h">What I can help with</h2></div>
-    <div class="wide"><Marquee /></div>
-  </section>
-
-  <section class="col section" id="work" aria-labelledby="work-h">
-    <h2 class="section-title" id="work-h">Selected work <span class="label">case studies</span></h2>
-    <ProjectList />
-  </section>
-
   <section class="col section" id="toolbox" aria-labelledby="tools-h">
-    <h2 class="section-title" id="tools-h">Toolbox <span class="label">software and languages I work with</span></h2>
+    <h2 class="section-title" id="tools-h">Toolbox</h2>
     <Toolbox />
   </section>
 
   <section class="col section" id="lab-notes" aria-labelledby="play-h">
-    <h2 class="section-title" id="play-h">Play <span class="label">experiments with design and code</span></h2>
+    <h2 class="section-title" id="play-h">Play</h2>
     <div class="folders">
       {playground.map((f) => <Folder {...f} />)}
     </div>
-    <a class="more-btn" href="/projects#nursery">See all my passion projects <span class="arrow" aria-hidden="true">→</span><span class="hearts" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></span></a>
+    <a class="more-btn" href="/projects#nursery">See all my passion projects <span class="arrow" aria-hidden="true">→</span></a>
   </section>
 
   <section class="col section" aria-labelledby="exp-h">
@@ -85,58 +87,40 @@ import { site, intro, playground } from '../data/site.js';
     background: repeating-linear-gradient(135deg, var(--paper-2) 0 6px, transparent 6px 12px);
   }
   .logo-ph span { font: 400 0.6rem/1 var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
-  .hello { margin-bottom: 14px; }
-  .role { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; color: var(--ink); }
-  .role-flower { font-size: 1.05rem; }
+  .role { margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; color: var(--ink); }
   h1 { font-size: var(--text-l); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 18px; }
-  h1 .hand { color: var(--dot); }
   .lead { max-width: 34rem; }
-  /* Highlighter marks: swept in one after another when the page loads */
-  .lead :global(mark) {
-    color: var(--ink); padding: 0 2px; margin: 0 -2px; border-radius: 3px;
-    background: linear-gradient(104deg, transparent 0.4em, var(--highlight) 0.5em, var(--highlight) calc(100% - 0.3em), transparent calc(100% - 0.2em)) no-repeat 0 62% / 100% 58%;
-    -webkit-box-decoration-break: clone; box-decoration-break: clone;
-    animation: mark-in 700ms var(--ease-out) both;
+  /* The one thing to do on this page: get in touch */
+  .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; padding: 11px 18px; border-radius: 999px; text-decoration: none;
+    font: 500 0.9rem/1 var(--sans); color: var(--on-navy); background: var(--navy);
+    transition: background var(--d-colour), transform 120ms var(--ease-out);
   }
-  .lead:first-of-type :global(mark:nth-of-type(1)) { animation-delay: 350ms; }
-  .lead:first-of-type :global(mark:nth-of-type(2)) { animation-delay: 550ms; }
-  .lead:nth-of-type(2) :global(mark:nth-of-type(1)) { animation-delay: 750ms; }
-  .lead:nth-of-type(2) :global(mark:nth-of-type(2)) { animation-delay: 950ms; }
-  @keyframes mark-in { from { background-size: 0% 58%; } }
-  .folders { display: flex; flex-wrap: wrap; gap: 32px 40px; padding: 84px 0 8px; } /* room above for the folders' chat bubbles */
-  /* Button below Play that leads to the passion projects page */
+  .btn:hover { background: var(--navy-2); }
+  .btn:active, .copy-mail:active { transform: scale(0.97); }
+  .copy-mail {
+    position: relative; display: inline-grid; padding: 10px 14px; border-radius: 999px; cursor: pointer;
+    font: 500 0.9rem/1 var(--sans); color: var(--ink); background: none; border: 1px solid var(--line);
+    transition: border-color var(--d-colour), transform 120ms var(--ease-out);
+  }
+  .copy-mail:hover { border-color: var(--ink-3); }
+  .copy-mail > span { grid-area: 1 / 1; text-align: center; transition: opacity var(--d-colour), translate var(--d-move) var(--ease-out); }
+  .copied-label { opacity: 0; translate: 0 6px; color: var(--mint-ink); }
+  .copy-mail.done .copy-label { opacity: 0; translate: 0 -6px; }
+  .copy-mail.done .copied-label { opacity: 1; translate: 0 0; }
+  .cv-link { font-size: 0.9rem; color: var(--ink-2); }
+  .folders { display: flex; flex-wrap: wrap; gap: 32px 40px; padding: 32px 0 8px; } /* the chat bubbles that pop up on hover may overlap the empty space above */
+  /* Link below Play that leads to the passion projects page */
   .more-btn {
     display: inline-flex; align-items: center; gap: 8px; margin-top: 28px;
-    padding: 11px 16px; border-radius: 999px; text-decoration: none;
-    font: 500 0.85rem/1 var(--sans); color: var(--ink);
-    background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow);
-    transition: transform var(--d-move) var(--spring), background var(--d-colour);
+    padding: 10px 16px; border-radius: 999px; text-decoration: none;
+    font: 500 0.85rem/1 var(--sans); color: var(--ink); border: 1px solid var(--line);
+    transition: border-color var(--d-colour);
   }
-  .more-btn .arrow { transition: transform var(--d-move) var(--spring); }
-  .more-btn:hover { background: var(--navy-soft); transform: translateY(-2px); }
+  .more-btn .arrow { transition: transform var(--d-move) var(--ease-out); }
+  .more-btn:hover { border-color: var(--ink-3); }
   .more-btn:hover .arrow { transform: translateX(3px); }
-  /* Hearts float up on hover, the same ones as on the passion projects page */
-  .more-btn { position: relative; --heart: #ec5f86; }
-  :global(:root[data-theme="dark"]) .more-btn { --heart: #ff8fb0; }
-  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .more-btn { --heart: #ff8fb0; } }
-  .more-btn .hearts { position: absolute; top: -2px; right: 18px; pointer-events: none; }
-  .more-btn .hearts i {
-    position: absolute; right: 0; top: 0; font-style: normal; font-size: 17px; line-height: 1;
-    color: var(--heart); opacity: 0; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
-  }
-  .more-btn .hearts i:nth-child(2) { right: 14px; font-size: 13px; }
-  .more-btn .hearts i:nth-child(3) { right: -8px; font-size: 11px; }
-  .more-btn:hover .hearts i, .more-btn:focus-visible .hearts i { animation: heart 1500ms var(--ease-out) forwards; }
-  .more-btn:hover .hearts i:nth-child(2), .more-btn:focus-visible .hearts i:nth-child(2) { animation-delay: 180ms; }
-  .more-btn:hover .hearts i:nth-child(3), .more-btn:focus-visible .hearts i:nth-child(3) { animation-delay: 360ms; }
-  @keyframes heart {
-    0% { opacity: 0; translate: 0 8px; scale: 0.5; }
-    15% { opacity: 1; scale: 1.15; }
-    70% { opacity: 1; }
-    100% { opacity: 0; translate: 8px -40px; scale: 0.9; }
-  }
-  @media (prefers-reduced-motion: reduce) { .more-btn:hover .hearts i { animation: none; } }
-  .more-btn:active { transform: translateY(0) scale(0.98); }
   @media (max-width: 640px) {
     .folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .folders :global(.folder) { zoom: 0.6; }
@@ -145,6 +129,14 @@ import { site, intro, playground } from '../data/site.js';
 
 <script>
   import { tick } from '../scripts/sound.js';
+  // Copy the email address and say so, for people whose mail app doesn't open from a link
+  const copyBtn = document.querySelector('.copy-mail');
+  const copyStatus = document.querySelector('[data-copy-status]');
+  copyBtn?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(copyBtn.dataset.email); } catch { return; }
+    copyBtn.classList.add('done'); copyStatus.textContent = 'Email address copied';
+    clearTimeout(copyBtn.t); copyBtn.t = setTimeout(() => { copyBtn.classList.remove('done'); copyStatus.textContent = ''; }, 1800);
+  });
   // Touch screens: tap the photo to make it bigger, tap anywhere to shrink it again
   const photo = document.querySelector('.hero .photo');
   if (photo) {

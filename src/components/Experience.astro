@@ -53,7 +53,7 @@ const groups = [
 
 <style>
   .exp { display: grid; gap: 48px; }
-  /* same style as the other section titles, e.g. "What I can help with" */
+  /* same style as the other section titles */
   .group-title { font-size: var(--text-m); font-weight: 500; color: var(--ink); margin-bottom: 14px; }
   ul { list-style: none; margin: 0; padding: 0; }
   .row {
@@ -65,7 +65,7 @@ const groups = [
   .has { cursor: pointer; outline-offset: 4px; -webkit-tap-highlight-color: transparent; user-select: none; }
   .org { font-weight: 500; }
   .role { color: var(--ink-2); }
-  .when { font: 400 0.78rem/1.4 var(--mono); color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 10px; justify-self: end; }
+  .when { font-size: 0.85rem; line-height: 1.4; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 10px; justify-self: end; }
 
   /* the small + that turns into − when open */
   .plus { position: relative; width: 9px; height: 9px; }
@@ -81,7 +81,7 @@ const groups = [
   .points li { position: relative; padding-left: 16px; color: var(--ink-2); font-size: 0.86rem; line-height: 1.5; }
   .points li:first-child { margin-top: 8px; }
   .points li:last-child { margin-bottom: 4px; }
-  .points li::before { content: ""; position: absolute; left: 2px; top: 0.6em; width: 5px; height: 5px; border-radius: 50%; background: var(--blush); }
+  .points li::before { content: ""; position: absolute; left: 2px; top: 0.6em; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
 
   .row.open .more { grid-template-rows: 1fr; opacity: 1; }
   .row.open .plus::after { transform: rotate(0deg); }
@@ -112,7 +112,7 @@ const groups = [
   .cert-ph {
     display: grid; place-content: center; justify-items: center; gap: 6px; color: var(--ink-3);
     background: repeating-linear-gradient(135deg, var(--paper-2) 0 7px, transparent 7px 14px);
-    font: 400 0.62rem/1 var(--mono); letter-spacing: 0.05em; text-transform: uppercase;
+    font-size: 0.75rem; line-height: 1;
   }
   @media (min-width: 1100px) {
     .cert-pop {

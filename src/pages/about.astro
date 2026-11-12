@@ -10,7 +10,7 @@ import { site, contact, aboutToggles } from '../data/site.js';
       {site.logo && <img class="logo" src={site.logo} alt={`${site.name} logo`} width="56" height="56" />}
       {site.photo && <img class="logo photo" src={site.photo} alt={`Photo of ${site.name}`} width="56" height="56" tabindex="0" />}
     </div>
-    <h1 id="about-me">About <span class="hand">me</span></h1>
+    <h1 id="about-me">About me</h1>
     <div class="photos"><PhotoAlbums /></div>
     <p>I’m Vivienne, a UX design student at The Hague University of Applied Sciences. At Decathlon Netherlands I work on search and AI growth: I design visual assets that guide people through complex information, and I shape content so it’s easier to find for both search engines and large language models.</p>
     <p>What drives me is how humans and computers understand each other, and how design can make technology feel intuitive and calm. Outside of work I build small creative tech projects that mix design and code, and I’m learning Python and math simply because I enjoy learning.</p>
@@ -25,7 +25,6 @@ import { site, contact, aboutToggles } from '../data/site.js';
   .photos { margin: 4px 0 32px; }
   .more-about { margin: 18px 0 30px; }
   h1 { font-size: var(--text-l); letter-spacing: -0.02em; margin-bottom: 20px; }
-  h1 .hand { color: var(--dot); }
   /* Same photo as on the home page: grows on hover (or tap / keyboard focus) */
   .marks { display: flex; gap: 12px; margin-bottom: 22px; position: relative; z-index: 5; }
   .logo { width: 56px; height: 56px; border-radius: 16px; object-fit: contain; }

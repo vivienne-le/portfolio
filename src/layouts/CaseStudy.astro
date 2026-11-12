@@ -42,7 +42,7 @@ const teamParts = (() => {
       {live && <a class="live" href={live} target="_blank" rel="noopener">{liveLabel} <span aria-hidden="true">↗</span></a>}
     </header>
     <figure class="wide cover">
-      {cover ? <img src={cover} alt="" /> : <div class="cover-ph"><Stamp src={null} label="cover image" /></div>}
+      {cover ? <img src={cover} alt="" fetchpriority="high" /> : <div class="cover-ph"><Stamp src={null} label="cover image" /></div>}
     </figure>
     <div class="col prose">
       {comingSoon
@@ -71,7 +71,7 @@ const teamParts = (() => {
   h1 { font-size: var(--text-l); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 14px; }
   .summary { font-size: 1.05rem; color: var(--ink-2); }
   .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 14px 20px; margin: 24px 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
-  .facts dt { font: 400 0.72rem/1.4 var(--mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+  .facts dt { font-size: 0.8rem; line-height: 1.4; color: var(--ink-2); }
   .facts dd { margin: 2px 0 0; font-size: 0.9rem; }
   .team-link { color: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
   .team-link:hover { text-decoration-color: currentColor; }
@@ -87,7 +87,7 @@ const teamParts = (() => {
   .skeleton { display: grid; gap: 14px; }
   .skeleton span { display: block; height: 14px; border-radius: 7px; background: var(--ink-3); opacity: 0.35; }
   .skeleton i { display: block; height: 18px; }
-  .cover img { width: 100%; border-radius: var(--radius-l); }
+  .cover img { width: 100%; border-radius: var(--radius-l); background: var(--paper-2); }   /* grey shows while the picture loads */
   .cover-ph { aspect-ratio: 16 / 9; max-width: 100%; border-radius: var(--radius-l); background: var(--paper-2); display: grid; place-items: center; }
   .cover-ph :global(.stamp-wrap) { width: 132px; height: 160px; rotate: -3deg; }
 
@@ -96,7 +96,7 @@ const teamParts = (() => {
   .prose :global(p), .prose :global(li) { color: var(--ink-2); }
   .prose :global(strong) { color: var(--ink); font-weight: 500; }
   .prose :global(ul), .prose :global(ol) { padding-left: 1.2em; margin: 0 0 14px; }
-  .prose :global(img) { border-radius: var(--radius-m); margin-block: 24px; }
+  .prose :global(img) { border-radius: var(--radius-m); margin-block: 24px; background: var(--paper-2); }
   .prose :global(blockquote) { margin: 28px 0; padding-left: 16px; border-left: 2px solid var(--blush); }
   .prose :global(blockquote p) { color: var(--ink); font-size: 1.05rem; }
   .prose :global(table) { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-block: 20px; display: block; overflow-x: auto; }
@@ -121,7 +121,7 @@ const teamParts = (() => {
   }
   .prose :global(.video-facade:hover .play) { scale: 1.08; }
   .prose :global(.video figcaption a) { color: var(--ink-2); }
-  .prose :global(.video figcaption) { margin-top: 10px; font-size: 0.8rem; color: var(--ink-3); text-align: center; }
+  .prose :global(.video figcaption) { margin-top: 10px; font-size: 0.8rem; color: var(--ink-2); text-align: center; }
   /* Code blocks */
   .prose :global(pre) { margin: 20px 0; padding: 16px 18px; border-radius: var(--radius-m); overflow-x: auto; font-size: 0.8rem; line-height: 1.6; }
   .prose :global(pre code) { background: none; padding: 0; font-size: inherit; line-height: inherit; }

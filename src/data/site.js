@@ -6,7 +6,7 @@
 
 export const site = {
   name: 'Vivienne Le',
-  role: 'Vivienne Le, a UX Designer & Engineer', // shown above the headline
+  role: 'Vivienne Le, UX designer & engineer', // shown above the headline
   shortName: 'Vivienne',
   title: 'Vivienne Le · Design Engineering & HCI',
   description:
@@ -107,10 +107,9 @@ export const aboutToggles = [
   },
 ];
 
-// Wrap the most important words in <mark>…</mark> to highlight them.
 export const intro = [
-  'Hi, I’m Vivienne. I study <mark>UX design</mark> at The Hague University of Applied Sciences and work on <mark>search and AI growth at Decathlon</mark>, making product content easier to find for people and for language models.',
-  'I’m curious about how humans and computers understand each other, and I’m heading toward a <mark>master’s in HCI</mark>. In between, I build small creative things with <mark>design and code</mark>.',
+  'I study UX design at The Hague University of Applied Sciences and work on search and AI growth at Decathlon, making product content easier to find for people and for language models.',
+  'I’m curious about how humans and computers understand each other, and I’m heading toward a master’s in HCI. In between, I build small creative things with design and code.',
 ];
 // cursor: an emoji (or an image path like '/images/x.png') that replaces the mouse pointer while hovering that line (optional)
 export const currently = {
@@ -217,21 +216,6 @@ export const tools = [
   { name: 'Arduino', icon: 'chip', logo: '/images/tools/arduino.png', fill: true },
 ]
 
-export const skills = [
-  'UX Research',
-  'Interaction Design',
-  'Prototyping',
-  'Information Architecture',
-  'Search & SEO',
-  'Content for LLM visibility',
-  'Visual Design',
-  'Responsible AI',
-  'Python',
-  'Figma',
-  'Illustrator & Photoshop',
-  'Making with hardware',
-];
-
 // Play folders (the "playground" list): each opens to show one photo stamp.
 // href: leave null so the folder only opens and goes nowhere, or add a link later.
 // message: optional. A blue chat bubble with this text pops up when someone hovers the folder.
@@ -265,7 +249,7 @@ export const experience = [
     org: 'Decathlon Netherlands', role: 'Search & AI Growth Specialist', when: '2026 – now',
     cursor: '/images/decathlon-logo-cursor.png',
     points: [
-      'Design visual assets that guide user journeys and make complex product information easier to understand',
+      'Design visuals that walk people through complex product information',
       'Shape content strategies that improve visibility in large language models',
       'Research search behaviour to decide what to optimise next',
     ],

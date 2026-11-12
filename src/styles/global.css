@@ -27,9 +27,11 @@ main:focus { outline: none; }
 
 h1, h2, h3 { margin: 0; font-weight: 500; text-wrap: balance; }
 h2.section-title { font-size: var(--text-m); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-p { margin: 0 0 14px; color: var(--ink-2); }
+p { margin: 0 0 14px; color: var(--ink-2); text-wrap: pretty; }
+li, dd { text-wrap: pretty; }
 .hand { font-family: var(--hand); font-weight: 400; font-size: 1.18em; letter-spacing: 0; }
-.label { font: 400 0.75rem/1.4 var(--mono); color: var(--ink-3); letter-spacing: 0.02em; }
+.label { font: 400 0.8rem/1.4 var(--sans); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.01em; }   /* only for code, the terminal and the clock */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Stamp: a perforated paper frame that crops any image inside it */
@@ -53,33 +55,12 @@ p { margin: 0 0 14px; color: var(--ink-2); }
   -webkit-mask: var(--sakura) center / contain no-repeat; mask: var(--sakura) center / contain no-repeat;
 }
 
-/* Status chips */
-.chip { font: 500 0.7rem/1 var(--sans); padding: 6px 9px; border-radius: 999px; white-space: nowrap; }
-/* Project status chips. The labels live in statusLabels in src/data/site.js */
-/* What stage it's at */
-.chip-concept { background: transparent; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--ink-3); }
-.chip-progress { background: var(--butter); color: var(--butter-ink); }
-.chip-prototype { background: var(--lilac); color: var(--lilac-ink); }
-.chip-live, .chip-shipped { background: var(--mint); color: var(--mint-ink); }
-.chip-live::before, .chip-shipped::before {   /* little "on air" dot */
-  content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; vertical-align: 1px;
-  border-radius: 50%; background: currentColor; animation: live-pulse 1.8s ease-in-out infinite;
+/* Status chips: one quiet style for every label, so the colour stays with the work itself.
+   The labels live in statusLabels in src/data/site.js */
+.chip {
+  font: 500 0.72rem/1 var(--sans); padding: 5px 8px; border-radius: 6px; white-space: nowrap;
+  color: var(--ink-2); background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--line);
 }
-@keyframes live-pulse { 50% { opacity: 0.3; } }
-/* What it is */
-.chip-website { background: var(--teal); color: var(--teal-ink); }
-.chip-app { background: var(--peach); color: var(--peach-ink); }
-.chip-game { background: var(--blush); color: #5c1f1d; }
-.chip-hardware { background: var(--clay); color: var(--clay-ink); }
-.chip-data { background: var(--navy-soft); color: var(--data-ink); }
-.chip-research { background: var(--sky); color: var(--sky-ink); }
-/* The story behind it */
-.chip-client { background: var(--client); color: var(--client-ink); }
-.chip-passion { background: var(--blush-soft); color: var(--blush-ink); }
-.chip-passion::before { content: "♥ "; }
-.chip-award { background: var(--note); color: var(--note-ink); }
-.chip-award::before { content: "★ "; }
-@media (prefers-reduced-motion: reduce) { .chip-live::before, .chip-shipped::before { animation: none; } }
 
 /* The terminal's secret */
 @keyframes wiggle { 0%, 100% { rotate: -2deg; } 50% { rotate: 2deg; } }
