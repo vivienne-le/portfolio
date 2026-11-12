@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Currently from '../components/Currently.astro';
 import ProjectList from '../components/ProjectList.astro';
+import Marquee from '../components/Marquee.astro';
 import Folder from '../components/Folder.astro';
 import Experience from '../components/Experience.astro';
 import Collage from '../components/Collage.astro';
@@ -18,7 +19,7 @@ import { site, intro, playground, contact } from '../data/site.js';
         ? <img class="logo photo" src={site.photo} alt={`Photo of ${site.name}`} width="56" height="56" tabindex="0" />
         : <div class="logo logo-ph" aria-hidden="true"><span>photo</span></div>}
     </div>
-    <p class="role">{site.role}</p>
+    <p class="role"><span class="sakura role-flower" aria-hidden="true"></span>{site.role}</p>
     <h1>I build things with code, then study how they feel.</h1>
     {intro.map((p) => <p class="lead">{p}</p>)}
     <div class="cta">
@@ -42,6 +43,11 @@ import { site, intro, playground, contact } from '../data/site.js';
     <Currently />
   </section>
 
+  <section class="section skills" aria-labelledby="skills-h">
+    <div class="col"><h2 class="section-title" id="skills-h">What I can help with</h2></div>
+    <div class="wide"><Marquee /></div>
+  </section>
+
   <section class="col section" id="toolbox" aria-labelledby="tools-h">
     <h2 class="section-title" id="tools-h">Toolbox</h2>
     <Toolbox />
@@ -52,7 +58,7 @@ import { site, intro, playground, contact } from '../data/site.js';
     <div class="folders">
       {playground.map((f) => <Folder {...f} />)}
     </div>
-    <a class="more-btn" href="/projects#nursery">See all my passion projects <span class="arrow" aria-hidden="true">→</span></a>
+    <a class="more-btn" href="/projects#nursery">See all my passion projects <span class="arrow" aria-hidden="true">→</span><span class="hearts" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></span></a>
   </section>
 
   <section class="col section" aria-labelledby="exp-h">
@@ -87,7 +93,8 @@ import { site, intro, playground, contact } from '../data/site.js';
     background: repeating-linear-gradient(135deg, var(--paper-2) 0 6px, transparent 6px 12px);
   }
   .logo-ph span { font: 400 0.6rem/1 var(--mono); color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
-  .role { margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+  .role { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+  .role-flower { font-size: 1.05rem; }
   h1 { font-size: var(--text-l); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 18px; }
   .lead { max-width: 34rem; }
   /* The one thing to do on this page: get in touch */
@@ -121,6 +128,27 @@ import { site, intro, playground, contact } from '../data/site.js';
   .more-btn .arrow { transition: transform var(--d-move) var(--ease-out); }
   .more-btn:hover { border-color: var(--ink-3); }
   .more-btn:hover .arrow { transform: translateX(3px); }
+  /* Hearts float up on hover, the same ones as on the passion projects page */
+  .more-btn { position: relative; --heart: #ec5f86; }
+  :global(:root[data-theme="dark"]) .more-btn { --heart: #ff8fb0; }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme="light"])) .more-btn { --heart: #ff8fb0; } }
+  .more-btn .hearts { position: absolute; top: -2px; right: 18px; pointer-events: none; }
+  .more-btn .hearts i {
+    position: absolute; right: 0; top: 0; font-style: normal; font-size: 17px; line-height: 1;
+    color: var(--heart); opacity: 0; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+  }
+  .more-btn .hearts i:nth-child(2) { right: 14px; font-size: 13px; }
+  .more-btn .hearts i:nth-child(3) { right: -8px; font-size: 11px; }
+  .more-btn:hover .hearts i, .more-btn:focus-visible .hearts i { animation: heart 1500ms var(--ease-out) forwards; }
+  .more-btn:hover .hearts i:nth-child(2), .more-btn:focus-visible .hearts i:nth-child(2) { animation-delay: 180ms; }
+  .more-btn:hover .hearts i:nth-child(3), .more-btn:focus-visible .hearts i:nth-child(3) { animation-delay: 360ms; }
+  @keyframes heart {
+    0% { opacity: 0; translate: 0 8px; scale: 0.5; }
+    15% { opacity: 1; scale: 1.15; }
+    70% { opacity: 1; }
+    100% { opacity: 0; translate: 8px -40px; scale: 0.9; }
+  }
+  @media (prefers-reduced-motion: reduce) { .more-btn:hover .hearts i { animation: none; } }
   @media (max-width: 640px) {
     .folders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     .folders :global(.folder) { zoom: 0.6; }

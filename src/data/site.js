@@ -220,6 +220,21 @@ export const tools = [
 // href: leave null so the folder only opens and goes nowhere, or add a link later.
 // message: optional. A blue chat bubble with this text pops up when someone hovers the folder.
 // chat: optional. ['question', 'answer'] pops up as a grey + blue conversation with an arrow pointing at the folder.
+export const skills = [
+  'UX Research',
+  'Interaction Design',
+  'Prototyping',
+  'Information Architecture',
+  'Search & SEO',
+  'Content for LLM visibility',
+  'Visual Design',
+  'Responsible AI',
+  'Python',
+  'Figma',
+  'Illustrator & Photoshop',
+  'Making with hardware',
+];
+
 export const playground = [
   { title: 'Coconut!', count: 'a different kind of controller', image:'/images/play-coconut.jpg', href: null },
   { title: 'My HTML-Zine', count: 'a peak into my bedroom', image:'/images/play-html-zine.jpg', href: 'https://html-zine-vivienne-le.vercel.app/', chat: ['How can I get there?', 'Just click here'] },
