@@ -24,6 +24,7 @@ const teamParts = (() => {
   <article class={`cs${comingSoon ? ' is-soon' : ''}`}>
     <div class="col"><a class="back label" href="/#work">← All work</a></div>
     {/* comingSoon: true in the frontmatter blurs the whole case study and shows a "coming soon" chat on top */}
+    {comingSoon && <h1 class="sr-only">{title}, coming soon</h1>}
     <div class="locked" {...(comingSoon ? { inert: true, 'aria-hidden': 'true' } : {})}>
     <header class="col" id="case">
       <div class="meta-top">
@@ -125,6 +126,7 @@ const teamParts = (() => {
   /* Code blocks */
   .prose :global(pre) { margin: 20px 0; padding: 16px 18px; border-radius: var(--radius-m); overflow-x: auto; font-size: 0.8rem; line-height: 1.6; }
   .prose :global(pre code) { background: none; padding: 0; font-size: inherit; line-height: inherit; }
+  .prose :global(pre span[style*="#6A737D"]) { color: #9ca5ae !important; }   /* lighter code comments, for contrast */
   /* "See the full code" toggle */
   .prose :global(.code-toggle) { margin: 8px 0 28px; border: 1px solid var(--line); border-radius: var(--radius-m); }
   .prose :global(.code-toggle summary) {

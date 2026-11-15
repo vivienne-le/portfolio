@@ -9,6 +9,9 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@fontsource/caveat-brush": "^5.2.8",
+    "@fontsource/geist": "^5.2.8",
+    "@fontsource/geist-mono": "^5.2.7",
     "astro": "7.3.8"
   }
 }

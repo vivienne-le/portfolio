@@ -59,7 +59,7 @@ To keep ourselves honest, we tested the preseason model with **leave-one-season-
 
 ## Results
 
-| | Our model | Average-season baseline |
+| Measure | Our model | Average-season baseline |
 |---|---|---|
 | **Season total error** | **34%** | 44% |
 | **Peak date error** | **±6.0 days** | ±6.3 days |

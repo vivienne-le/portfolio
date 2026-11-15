@@ -1,4 +1,11 @@
 ---
+// Fonts are served from this site (not Google), so visitors' IP addresses never go to a third party
+import '@fontsource/geist/400.css';
+import '@fontsource/geist/500.css';
+import '@fontsource/geist/600.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/500.css';
+import '@fontsource/caveat-brush/400.css';
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import StickyNote from '../components/StickyNote.astro';
@@ -49,9 +56,6 @@ const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: si
     <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#131015" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/logos/logo.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Caveat+Brush&display=swap" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

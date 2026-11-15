@@ -22,7 +22,7 @@ const nowLines = currently.items.map((i) => `${i.label}: ${i.value}`);
     </nav>
     <button class="term-toggle label mono" type="button" aria-expanded="false" aria-controls="terminal">› terminal</button>
   </div>
-  <p class="copy label">© {thisYear} {site.name}. Designed and built by me.</p>
+  <p class="copy label">© {thisYear} {site.name}. Designed and built by me. <a href="/privacy">Privacy</a></p>
 
   <div class="terminal" id="terminal" data-now={JSON.stringify(nowLines)} hidden>
     <div class="term-head"><span>guest@vivienne:~</span><button type="button" class="term-close" aria-label="Close terminal">esc</button></div>

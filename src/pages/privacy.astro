@@ -1,0 +1,44 @@
+---
+// Privacy notice. Keep it true: update it whenever the site starts using a new service.
+import Base from '../layouts/Base.astro';
+import { site, contact } from '../data/site.js';
+---
+<Base title={`Privacy · ${site.name}`} description="What this site does and doesn't do with your data.">
+  <article class="col privacy">
+    <a class="back label" href="/">← Home</a>
+    <h1>Privacy</h1>
+    <p class="intro">The short version: this site has no cookies, no analytics and no tracking. Here is everything it does touch.</p>
+
+    <h2>Who runs this site</h2>
+    <p>{site.name}, a UX design student based in the Netherlands. This is my personal portfolio. Questions about your data go to <a href={`mailto:${contact.email}`}>{contact.email}</a>.</p>
+
+    <h2>Hosting</h2>
+    <p>The site is hosted by <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Inc.</a> in the US. To deliver pages and keep the site safe, Vercel's servers see the technical data every website receives: your IP address, browser, the page you asked for and the time. I don't get a list of visitors and I don't look at these logs. Vercel is certified under the EU-U.S. Data Privacy Framework. Legal basis: my legitimate interest in running a working, secure website (Art. 6(1)(f) GDPR).</p>
+
+    <h2>Fonts</h2>
+    <p>The fonts (Geist, Geist Mono and Caveat Brush) are served from this site itself, so your browser doesn't contact Google or any other font service.</p>
+
+    <h2>Things saved in your browser</h2>
+    <p>If you turn the sounds off or move stickers around, the site remembers that in your browser's local storage, so it's still that way next time. It never leaves your device, I can't see it, and you can delete it by clearing your browser data for this site.</p>
+
+    <h2>Video</h2>
+    <p>One case study has a YouTube video. Nothing is loaded from YouTube until you click play. When you do, the video loads from youtube-nocookie.com and Google receives your IP address and browser data under <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">its own privacy policy</a>.</p>
+
+    <h2>Email and links</h2>
+    <p>If you email me, I use your address and message only to reply, and delete them when we're done talking. Links to LinkedIn, GitHub, Figma and my other projects take you to those sites, which have their own privacy policies.</p>
+
+    <h2>Your rights</h2>
+    <p>You can ask me what data I have about you, and to correct or delete it. You can also complain to a data protection authority, in the Netherlands the <a href="https://autoriteitpersoonsgegevens.nl/en" target="_blank" rel="noopener">Autoriteit Persoonsgegevens</a>.</p>
+
+    <p class="label updated">Last updated November 2026</p>
+  </article>
+</Base>
+
+<style>
+  .privacy { padding-top: 40px; padding-bottom: 40px; }
+  .back { display: inline-block; margin-bottom: 28px; text-decoration: none; }
+  h1 { font-size: var(--text-l); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 14px; }
+  .intro { font-size: 1.05rem; color: var(--ink); margin-bottom: 32px; }
+  h2 { font-size: 1rem; font-weight: 500; margin: 28px 0 6px; }
+  .updated { margin-top: 36px; }
+</style>
