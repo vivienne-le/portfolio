@@ -49,3 +49,13 @@ Any image is cropped into the post-stamp shape automatically.
 - **Sound:** off by default. The speaker icon in the nav turns it on, and the choice is remembered.
 - **Footer:** hover the binary year to decode it. `› terminal` opens a terminal: try `help`.
 - **Reduced motion:** every animation is toned down when the visitor's system asks for it.
+
+## Checks before you publish
+
+```bash
+npm run setup       # once per clone: commits are made as you, and the authorship hooks are on
+npm run test:a11y   # builds the site and checks every page for accessibility (WCAG 2.2 AA)
+```
+
+GitHub runs the same accessibility check, plus an authorship check, on every push (see the Actions tab).
+The rules for making changes accessible are in `CLAUDE.md`.

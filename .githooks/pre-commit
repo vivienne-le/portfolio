@@ -1,0 +1,9 @@
+#!/bin/sh
+# Refuses commits whose author or committer is an AI assistant. Fix it with: npm run setup
+for who in "$(git var GIT_AUTHOR_IDENT)" "$(git var GIT_COMMITTER_IDENT)"; do
+  if echo "$who" | grep -qiE 'claude|anthropic'; then
+    echo "Commit refused: it would be signed '$(echo "$who" | sed 's/>.*/>/')'."
+    echo "Run 'npm run setup' so commits are made as Vivienne Le, then commit again."
+    exit 1
+  fi
+done

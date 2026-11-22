@@ -1,0 +1,32 @@
+# Runs on every push and pull request. A red cross on GitHub means one of these failed.
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  authorship:
+    name: Vivienne is the only author
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: No AI authors or co-author lines in any commit
+        run: |
+          found=$(git log --format='%h %an <%ae> | %cn <%ce>%n%b' | grep -iE 'claude|anthropic|co-authored-by' || true)
+          if [ -n "$found" ]; then echo "$found"; exit 1; fi
+
+  accessibility:
+    name: Accessibility (WCAG 2.2 AA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:a11y

@@ -10,7 +10,7 @@ const isLink = href && href !== '#';
 const Tag = isLink ? 'a' : 'button';
 const external = isLink && /^https?:/.test(href);
 ---
-<Tag class="folder" {...(isLink ? { href } : { type: 'button', 'aria-pressed': 'false' })} {...(external ? { target: '_blank', rel: 'noopener' } : {})} aria-label={`${title}, ${count}${external ? ' (opens in a new tab)' : ''}`}>
+<Tag class="folder" {...(isLink ? { href } : { type: 'button', 'aria-pressed': 'false' })} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
   {lines && (
     <span class="chat" aria-hidden="true">
       {lines[0] && <span class="q">{lines[0]}</span>}
@@ -25,8 +25,8 @@ const external = isLink && /^https?:/.test(href);
   )}
   <span class="back" aria-hidden="true"></span>
   <span class="s" aria-hidden="true"><Stamp src={image} alt="" /></span>
-  <span class="front" aria-hidden="true">
-    <span><b>{title}</b><small>{count}</small></span>
+  <span class="front">
+    <span><b>{title}</b> <small>{count}</small>{external && <span class="sr-only"> (opens in a new tab)</span>}</span>
   </span>
 </Tag>
 

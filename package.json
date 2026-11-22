@@ -6,11 +6,17 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test:a11y": "astro build && node tests/a11y.mjs",
+    "setup": "git config user.name \"Vivienne Le\" && git config user.email work.viviennele@gmail.com && git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@fontsource/caveat-brush": "^5.2.8",
     "@fontsource/geist-mono": "^5.2.7",
     "astro": "7.3.8"
+  },
+  "devDependencies": {
+    "axe-core": "^4.14.0",
+    "playwright": "^1.63.0"
   }
 }
