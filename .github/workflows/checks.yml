@@ -10,7 +10,7 @@ jobs:
     name: Vivienne is the only author
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: No AI authors or co-author lines in any commit
@@ -22,8 +22,8 @@ jobs:
     name: Accessibility (WCAG 2.2 AA)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
